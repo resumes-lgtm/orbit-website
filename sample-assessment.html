@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sample GAPS™ Assessment — ORBIT</title>
+<meta name="description" content="A sample output of a GAPS™ Assessment — illustrative dimension scores, root-cause diagnosis, prioritized interventions, and a verified outcome from a closed loop.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23020B20'/%3E%3Ccircle cx='32' cy='32' r='30' fill='none' stroke='url(%23g)' stroke-width='6'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='64' y2='64'%3E%3Cstop offset='0' stop-color='%23E8B963'/%3E%3Cstop offset='.5' stop-color='%235D5CEF'/%3E%3Cstop offset='1' stop-color='%2363CCDF'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#020B20; --navy-900:#050F2E; --navy-800:#0E2260;
+  --gold-600:#8A5A0B; --gold-500:#E8B963; --gold-400:#F0CF94; --gold-100:#FBF1DC;
+  --bg:#F7F8FC; --surface:#FFFFFF; --surface-2:#F1F4FA;
+  --text:#0B1330; --text-dim:#3A4567; --muted:#5F6A8A; --line:#E0E5F1; --line-strong:#C9D1E6;
+  --accent:#1848E8; --on-accent:#FFFFFF; --accent-soft:#E8EEFF;
+  --purple:#4B4AD6; --purple-bg:#EEEEFD;
+  --green:#17704A; --green-bg:#E5F4EC; --orange:#A85D07; --orange-bg:#FDF0DC;
+  --red:#B3302A; --red-bg:#FBE9E8;
+  --shadow:0 6px 24px rgba(2,11,32,.07); --shadow-lg:0 20px 60px rgba(2,11,32,.16);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#040B1F; --surface:#0A1533; --surface-2:#0D1A3C;
+    --text:#ECF0FC; --text-dim:#C1CAE6; --muted:#8E9AC0; --line:#182652; --line-strong:#27386F;
+    --accent:#7C9BFF; --on-accent:#020B20; --accent-soft:#13235C;
+    --purple:#ADACFA; --purple-bg:#1F1F55;
+    --green:#4CC98A; --green-bg:#0E2E22; --orange:#F0A340; --orange-bg:#35240E;
+    --red:#F27A72; --red-bg:#3A1616;
+    --shadow:0 6px 24px rgba(0,0,0,.4); --shadow-lg:0 20px 60px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:"Playfair Display",Georgia,serif;text-wrap:balance;margin:0;color:var(--text)}
+p{margin:0;line-height:1.65}
+a{color:inherit}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-600)}
+.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold-500)}
+.mono{font-family:"IBM Plex Mono",monospace}
+section{padding:56px 0}
+@media(max-width:720px){section{padding:38px 0}}
+
+/* header */
+header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;max-width:1040px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo{width:32px;height:32px;flex:none;border-radius:50%;background:conic-gradient(from 220deg,#E8B963,#5D5CEF,#63CCDF,#E8B963);position:relative;box-shadow:0 0 0 2px var(--bg)}
+.logo:after{content:"";position:absolute;inset:6px;background:var(--navy-950);border-radius:50%}
+.brand b{font-family:"Playfair Display",serif;font-size:19px;letter-spacing:.02em;color:var(--text)}
+.brand small{display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:-1px}
+@media(max-width:520px){.brand small{display:none}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;padding:13px 22px;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:14.5px;text-decoration:none;transition:transform .15s,opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.92;transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line-strong)}
+.btn.ghost:hover{border-color:var(--accent);background:var(--accent-soft)}
+.btn.gold{background:var(--gold-500);color:var(--navy-950)}
+.btn.sm{padding:9px 16px;font-size:13px;border-radius:9px}
+
+/* illustrative banner */
+.illus{background:var(--orange-bg);border-bottom:1px solid var(--orange);color:var(--orange)}
+.illus .wrap{padding:10px 24px;font-size:12.5px;font-weight:600;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+
+/* cover */
+.cover h1{font-size:38px;line-height:1.15;margin:14px 0 14px;max-width:20ch}
+@media(max-width:560px){.cover h1{font-size:28px}}
+.cover p.lead{font-size:16px;color:var(--text-dim);max-width:62ch}
+.meta{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+@media(max-width:760px){.meta{grid-template-columns:1fr 1fr}}
+.meta div{border-top:2px solid var(--gold-500);padding-top:10px}
+.meta .k{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.meta .v{font-size:14px;font-weight:700;margin-top:3px}
+
+/* dimension scorecards */
+.dim-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:32px}
+@media(max-width:900px){.dim-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:520px){.dim-grid{grid-template-columns:1fr}}
+.dim-card{border-radius:16px;padding:20px;color:#fff;position:relative;overflow:hidden;min-height:190px;display:flex;flex-direction:column}
+.dim-card:before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.14),transparent 60%)}
+.dim-g{background:linear-gradient(160deg,#1f7a4d,#124a2e)}
+.dim-a{background:linear-gradient(160deg,#2c5fb8,#173a80)}
+.dim-p{background:linear-gradient(160deg,#c97a1f,#8f560e)}
+.dim-s{background:linear-gradient(160deg,#6b35ba,#432271)}
+.dim-card .top{display:flex;justify-content:space-between;align-items:flex-start;position:relative}
+.dim-card .letter{font-family:"Playfair Display",serif;font-size:26px;font-weight:800}
+.dim-card .score{font-family:"Playfair Display",serif;font-size:30px;font-weight:800}
+.dim-card .score sub{font-family:Inter;font-size:12px;font-weight:600;opacity:.75}
+.dim-card h4{color:#fff;font-size:14.5px;margin:10px 0 6px;position:relative}
+.dim-card p{font-size:12.5px;line-height:1.5;opacity:.95;position:relative;margin-top:auto}
+.dim-card .bar{height:6px;border-radius:99px;background:rgba(255,255,255,.25);overflow:hidden;margin:10px 0 8px;position:relative}
+.dim-card .bar i{display:block;height:100%;background:#fff;border-radius:99px}
+.dim-flag{position:absolute;top:16px;right:16px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;background:rgba(255,255,255,.22);padding:3px 8px;border-radius:6px}
+
+/* deep dive */
+.tri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-top:26px}
+@media(max-width:800px){.tri{grid-template-columns:1fr}}
+.tricard{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow)}
+.tricard .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--gold-600);margin-bottom:8px}
+.tricard p{font-size:13.5px;color:var(--text-dim);line-height:1.6}
+.tricard .own{margin-top:14px;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}
+.tricard .own b{color:var(--text)}
+
+/* loop proof */
+.proofcard{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:26px;box-shadow:var(--shadow-lg);margin-top:26px}
+.prooftag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;color:var(--green);background:var(--green-bg);padding:4px 10px;border-radius:7px}
+.tl{border-left:2px solid var(--line-strong);padding-left:20px;display:grid;gap:20px;margin-top:20px}
+.tlrow{position:relative}
+.tlrow:before{content:"";position:absolute;left:-25px;top:3px;width:10px;height:10px;border-radius:50%;background:var(--gold-500);box-shadow:0 0 0 3px var(--surface)}
+.tlrow .time{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--gold-600);display:block;margin-bottom:3px}
+.tlrow b{color:var(--text);font-size:14.5px}
+.tlrow p{font-size:13.5px;color:var(--text-dim);margin-top:3px;line-height:1.55}
+.result{margin-top:22px;padding:16px 18px;border-radius:12px;background:var(--green-bg);border:1px solid var(--green);color:var(--text);font-size:13.5px;line-height:1.6}
+.result b{color:var(--green)}
+
+/* footer cta */
+.closing{text-align:center;background:var(--navy-950);border-radius:24px;padding:44px 32px;color:#fff;margin:0 auto;max-width:1000px;border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow-lg)}
+.closing h2{color:#fff;font-size:26px}
+.closing p{color:#C1CAE6;font-size:14.5px;max-width:56ch;margin:12px auto 0}
+.closing .row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-top:24px}
+.foot-fine{margin-top:28px;font-size:12px;color:var(--muted);line-height:1.7;max-width:70ch;text-align:center;margin-left:auto;margin-right:auto}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="headrow">
+    <a class="brand" href="index.html"><div class="logo"></div><div><b>ORBIT</b><small>Workforce Readiness Intelligence</small></div></a>
+    <a class="btn ghost sm" href="index.html">&larr; theorbitsuite.com</a>
+  </div>
+</header>
+
+<div class="illus">
+  <div class="wrap">⚠ Sample output. Meridian Systems is a composite organization built to illustrate the format — not a real client, and not real data.</div>
+</div>
+
+<main>
+<section class="cover">
+  <div class="wrap">
+    <span class="eyebrow">Sample GAPS™ Assessment</span>
+    <h1>What a GAPS™ Assessment actually looks like.</h1>
+    <p class="lead">A baseline diagnostic across all four dimensions, a root-cause read on the sharpest gap, and proof that a past intervention was actually verified — not just flagged. This sample uses an illustrative organization to show the format a real assessment follows.</p>
+    <div class="meta">
+      <div><span class="k">Organization</span><div class="v">Meridian Systems (illustrative)</div></div>
+      <div><span class="k">Size</span><div class="v">1,400 employees</div></div>
+      <div><span class="k">Scope</span><div class="v">Organization-wide baseline</div></div>
+      <div><span class="k">Period</span><div class="v">Q3 2026</div></div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0">
+  <div class="wrap">
+    <span class="eyebrow">Step 1 — where the gaps are</span>
+    <h2 style="font-size:26px;margin-top:12px">Every dimension, scored the same day.</h2>
+    <div class="dim-grid">
+      <div class="dim-card dim-g">
+        <div class="top"><span class="letter">G</span><span class="score">64<sub>/100</sub></span></div>
+        <h4>Growth</h4>
+        <div class="bar"><i style="width:64%"></i></div>
+        <p>Capability-building keeps pace in Operations; Sales is 5 months behind its own ramp targets.</p>
+      </div>
+      <div class="dim-card dim-a">
+        <div class="top"><span class="letter">A</span><span class="score">41<sub>/100</sub></span></div>
+        <h4>Advancement</h4>
+        <div class="bar"><i style="width:41%"></i></div>
+        <p>High-potential ICs are stalling 18+ months before their next role in 3 of 6 divisions.</p>
+      </div>
+      <div class="dim-card dim-p">
+        <div class="top"><span class="letter">P</span><span class="score">77<sub>/100</sub></span></div>
+        <h4>Performance</h4>
+        <div class="bar"><i style="width:77%"></i></div>
+        <p>Training investment is converting to measurable output in most functions this quarter.</p>
+      </div>
+      <div class="dim-card dim-s">
+        <div class="dim-flag">Sharpest gap</div>
+        <div class="top"><span class="letter">S</span><span class="score">29<sub>/100</sub></span></div>
+        <h4>Strategic Risk</h4>
+        <div class="bar"><i style="width:29%"></i></div>
+        <p>6 of 9 VP-level roles have no identified successor.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">Steps 2 &amp; 3 — why it exists, what to do</span>
+    <h2 style="font-size:26px;margin-top:12px;max-width:30ch">Strategic Risk: are you ready if half of Meridian's VPs leave?</h2>
+    <p style="margin-top:10px;font-size:14px;color:var(--text-dim);max-width:70ch">6 of 9 VP roles carry no documented backup. Three sit in Engineering and Finance — the two functions Meridian's board has flagged as hardest to backfill externally.</p>
+    <div class="tri">
+      <div class="tricard">
+        <div class="lab">Where</div>
+        <p><b style="color:var(--text)">Key-Person Dependency Risk.</b> Engineering (2 roles) and Finance (1 role) have zero identified internal successors. The other three sit in Sales, Ops, and People — lower severity but still open.</p>
+      </div>
+      <div class="tricard">
+        <div class="lab">Why</div>
+        <p>Succession planning has lived in one HRBP's spreadsheet, refreshed once a year before the board meeting. No standing review cadence, no development plan attached to any named successor candidate.</p>
+      </div>
+      <div class="tricard">
+        <div class="lab">What to do</div>
+        <p>Name 2 successor candidates per at-risk VP role within 90 days; start a development plan for each; move Engineering and Finance onto the CEO's quarterly review.</p>
+        <div class="own">Owner: <b>Chief People Officer</b> · Due: <b>Dec 15, 2026</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <span class="eyebrow">Step 4 — whether it worked</span>
+    <h2 style="font-size:26px;margin-top:12px;max-width:30ch">Closing the loop on last quarter's flagged gap.</h2>
+    <p style="margin-top:10px;font-size:14px;color:var(--text-dim);max-width:70ch">This is what separates an assessment from a dashboard: ORBIT comes back to a gap it already flagged and reports what actually happened.</p>
+    <div class="proofcard">
+      <span class="prooftag">✓ Verified outcome</span>
+      <div class="tl">
+        <div class="tlrow"><span class="time">Q1 2026 · Flagged</span><b>Growth gap: Sales onboarding time-to-productivity.</b><p>New reps were taking 40% longer than target to hit full productivity — the widest Growth gap in the org that quarter.</p></div>
+        <div class="tlrow"><span class="time">Q1 2026 · Intervention</span><b>Restructured 30-60-90 onboarding.</b><p>Added weekly manager check-ins and a named onboarding buddy for every new rep, starting with the February cohort.</p></div>
+        <div class="tlrow"><span class="time">Q2 2026 · Re-scored</span><b>Time-to-productivity re-measured against the same target.</b><p>ORBIT re-ran the same Growth score for the Sales org against the February and March cohorts.</p></div>
+      </div>
+      <div class="result"><b>Verified:</b> time-to-productivity gap closed from 40% above target to 8% above target — a 22-point Growth score improvement for the Sales org, confirmed against actual ramp data, not self-reported.</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap">
+    <div class="closing">
+      <span class="eyebrow" style="color:var(--gold-500)">Ready for your own baseline?</span>
+      <h2 style="margin-top:12px">This is the format. Your data replaces Meridian's.</h2>
+      <p>A real GAPS™ Assessment starts with your own people, pathways, programs, and organizational data — scored the same way, on the same four dimensions, with the same loop back to verify what worked.</p>
+      <div class="row">
+        <a class="btn gold" href="mailto:jhenealmcduffie@gmail.com?subject=Book%20a%20GAPS%E2%84%A2%20Assessment">Book a GAPS™ Assessment</a>
+        <a class="btn ghost" style="border-color:rgba(255,255,255,.3)" href="index.html">Back to the platform</a>
+      </div>
+    </div>
+    <p class="foot-fine">Meridian Systems, its people, scores, and outcomes are illustrative composites built to show the shape of a GAPS™ Assessment — not a real client, engagement, or result. A real assessment's scope, dimensions weighted, and cadence are scoped to the organization being assessed.</p>
+  </div>
+</section>
+</main>
+
+</body>
+</html>

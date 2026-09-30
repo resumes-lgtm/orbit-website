@@ -1,0 +1,1567 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>ORBIT Transition Services Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Layout: fixed left rail (role switcher + page list) beside one working canvas. Palette is ORBIT's canonical set: deep navy, electric blue, purple, cyan, gold. */
+:root{
+  --navy-950:#020B20; --navy-900:#050F2E; --navy-800:#0E2260; --navy-700:#173585;
+  --side-a:#020B20; --side-b:#0B1F5E;
+  --gold-600:#8A5A0B; --gold-500:#E8B963; --gold-400:#F0CF94; --gold-100:#FBF1DC;
+  --bg:#F2F5FB; --surface:#FFFFFF; --surface-2:#F6F8FD;
+  --text:#0B1330; --text-dim:#3A4567; --muted:#5F6A8A; --line:#E0E5F1; --line-strong:#C9D1E6;
+  --accent:#1848E8; --on-accent:#FFFFFF; --accent-soft:#E8EEFF;
+  --green:#17704A; --green-bg:#E5F4EC; --orange:#A85D07; --orange-bg:#FDF0DC;
+  --red:#B3302A; --red-bg:#FBE9E8; --blue:#1848E8; --blue-bg:#E8EEFF; --purple:#4B4AD6; --purple-bg:#EEEEFD;
+  --series-a:#1848E8; --series-b:#B8770F;
+  --shadow:0 6px 24px rgba(2,11,32,.07);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --gold-600:#E8B963; --gold-400:#E8B963; --gold-100:rgba(232,185,99,.14);
+    --bg:#040B1F; --surface:#0A1533; --surface-2:#071029;
+    --text:#ECF0FC; --text-dim:#C1CAE6; --muted:#8E9AC0; --line:#182652; --line-strong:#27386F;
+    --accent:#7C9BFF; --on-accent:#020B20; --accent-soft:#13235C;
+    --green:#4CC98A; --green-bg:#0E2E22; --orange:#F0A340; --orange-bg:#35240E;
+    --red:#F27A72; --red-bg:#3A1616; --blue:#94AEFF; --blue-bg:#13235C; --purple:#ADACFA; --purple-bg:#1F1F55;
+    --series-a:#5B7CFA; --series-b:#BA8125;
+    --shadow:0 6px 24px rgba(0,0,0,.45);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --gold-600:#E8B963; --gold-400:#E8B963; --gold-100:rgba(232,185,99,.14);
+  --bg:#040B1F; --surface:#0A1533; --surface-2:#071029;
+  --text:#ECF0FC; --text-dim:#C1CAE6; --muted:#8E9AC0; --line:#182652; --line-strong:#27386F;
+  --accent:#7C9BFF; --on-accent:#020B20; --accent-soft:#13235C;
+  --green:#4CC98A; --green-bg:#0E2E22; --orange:#F0A340; --orange-bg:#35240E;
+  --red:#F27A72; --red-bg:#3A1616; --blue:#94AEFF; --blue-bg:#13235C; --purple:#ADACFA; --purple-bg:#1F1F55;
+  --series-a:#5B7CFA; --series-b:#BA8125;
+  --shadow:0 6px 24px rgba(0,0,0,.45);
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif;font-variant-numeric:tabular-nums}
+h1,h2,h3,h4{font-family:"Playfair Display",Georgia,serif;text-wrap:balance;margin:0}
+::selection{background:var(--gold-500);color:var(--navy-950)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.side :focus-visible{outline-color:#E8B963}
+.small{font-size:12.5px}
+.center{text-align:center}
+.mt{margin-top:18px}
+
+.app{display:grid;grid-template-columns:262px minmax(0,1fr);min-height:100%}
+.side{background:linear-gradient(175deg,var(--side-a),var(--side-b));color:#fff;padding:24px 14px;position:sticky;top:0;height:100vh;overflow:auto;border-right:1px solid rgba(255,255,255,.06)}
+.brand{display:flex;gap:12px;align-items:center;margin-bottom:20px;padding:0 6px}
+.logo{width:38px;height:38px;flex:none;border-radius:50%;background:conic-gradient(from 220deg,#E8B963,#5D5CEF,#63CCDF,#E8B963);position:relative;box-shadow:0 0 0 3px rgba(255,255,255,.12)}
+.logo:after{content:"";position:absolute;inset:8px;background:var(--navy-950);border-radius:50%}
+.brand h1{font-size:19px;color:#fff;letter-spacing:.02em}
+.brand small{display:block;color:#E8B963;margin-top:2px;font-family:Inter;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;font-weight:600}
+.sidelabel{font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:#8FA0C9;font-weight:700;margin:0 6px 8px}
+.roles{display:flex;flex-direction:column;gap:6px;margin-bottom:20px}
+.role{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);color:#DFE6F7;padding:8px 10px;border-radius:10px;cursor:pointer;transition:background .15s,border-color .15s}
+.role:hover{background:rgba(255,255,255,.09)}
+.role.active{border-color:#E8B963;background:rgba(232,185,99,.14);color:#fff}
+.role .bdg{width:30px;height:30px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:11px;background:rgba(255,255,255,.12);flex:none;letter-spacing:.04em}
+.role.active .bdg{background:#E8B963;color:#020B20}
+.role b{display:block;font-size:13px;font-weight:700}
+.role span.sub{display:block;font-size:11px;color:#9FB0D6;line-height:1.3}
+.nav{display:flex;flex-direction:column;gap:2px}
+.nav button{width:100%;background:transparent;border:0;color:#C9D2E8;text-align:left;padding:10px 13px;border-radius:9px;cursor:pointer;font-size:13px;font-weight:500;display:flex;align-items:center;gap:10px;transition:background .15s,color .15s}
+.nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+.nav button.active{background:#E8B963;color:#020B20;font-weight:700}
+.side-foot{margin-top:18px;padding:12px 13px;border-top:1px solid rgba(255,255,255,.1);color:#8FA0C9;font-size:11px;line-height:1.5}
+
+.main{padding:26px 32px 48px;min-width:0}
+.demobar{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;background:var(--surface-2);border:1px dashed var(--line-strong);border-radius:10px;padding:8px 12px;margin-bottom:16px;font-size:12.5px;color:var(--text-dim)}
+.demobar .live{display:inline-flex;align-items:center;gap:6px;font-weight:700;color:var(--green)}
+.demobar .live:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--green)}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;gap:14px;flex-wrap:wrap}
+.title{min-width:0}
+.title h2{font-size:26px;color:var(--text)}
+.title p{margin:6px 0 0;color:var(--muted);font-size:14.5px}
+.pill{padding:7px 13px;border-radius:999px;background:var(--gold-100);color:var(--gold-600);font-weight:700;font-size:12.5px;letter-spacing:.03em;white-space:nowrap;border:1px solid var(--gold-500)}
+
+.grid{display:grid;gap:18px}
+.g4{grid-template-columns:repeat(4,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:20px;box-shadow:var(--shadow);min-width:0}
+.card h3{font-size:17px;margin:0 0 14px;color:var(--text)}
+.kicker{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--gold-600)}
+
+.metric .k{color:var(--muted);font-size:12.5px;font-weight:600;letter-spacing:.04em;text-transform:uppercase}
+.metric .v{font-family:"Playfair Display",serif;font-size:30px;font-weight:800;margin-top:6px;line-height:1}
+.good{color:var(--green)}.warn{color:var(--orange)}.bad{color:var(--red)}.muted{color:var(--muted)}
+.section{display:none}
+.section.active{display:block}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+
+.tag{display:inline-flex;align-items:center;padding:5px 10px;border-radius:7px;font-size:12px;font-weight:700;background:var(--blue-bg);color:var(--blue);white-space:nowrap}
+.tag.green{background:var(--green-bg);color:var(--green)}
+.tag.red{background:var(--red-bg);color:var(--red)}
+.tag.orange{background:var(--orange-bg);color:var(--orange)}
+.tag.purple{background:var(--purple-bg);color:var(--purple)}
+.tag.gold{background:var(--gold-100);color:var(--gold-600)}
+.tag.plain{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:12px}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+th,td{padding:12px 13px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{background:var(--surface-2);color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.05em;font-weight:700}
+td b{color:var(--text)}
+
+.btn{border:0;border-radius:10px;padding:11px 18px;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:14px;cursor:pointer;transition:opacity .15s}
+.btn:hover{opacity:.9}
+.btn.secondary{background:var(--surface-2);color:var(--text);border:1px solid var(--line-strong)}
+.btn.danger{background:var(--red);color:#fff}
+.btn.big{padding:15px 26px;font-size:16px;border-radius:12px}
+.btn.sm{padding:7px 12px;font-size:12.5px}
+.link{background:none;border:0;color:var(--accent);text-decoration:underline;font-weight:600;cursor:pointer;padding:8px;font-size:13.5px}
+
+.gaps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.gapbox{border-radius:14px;padding:18px;color:#fff;position:relative;overflow:hidden}
+.gapbox:before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.16),transparent 60%)}
+.g{background:linear-gradient(160deg,#1f7a4d,#155c39)}
+.a{background:linear-gradient(160deg,#2c5fb8,#1e4590)}
+.p{background:linear-gradient(160deg,#c97a1f,#a35f10)}
+.s{background:linear-gradient(160deg,#6b35ba,#4f2590)}
+.gapbox strong{display:block;font-family:"Playfair Display",serif;font-size:24px;position:relative}
+.gapbox b{display:block;margin-top:8px;font-size:14px;position:relative}
+.gapbox span{position:relative;font-size:12.5px;opacity:.92;display:block;margin-top:4px}
+
+.notice{padding:14px 16px;border-radius:12px;background:var(--orange-bg);border:1px solid var(--orange);color:var(--orange);font-size:14px;line-height:1.5}
+.notice.blue{background:var(--blue-bg);border-color:var(--blue);color:var(--blue)}
+.insight{border-left:3px solid var(--purple);padding:11px 14px;background:var(--purple-bg);border-radius:8px;margin:10px 0;font-size:14px;line-height:1.5}
+.insight b{color:var(--text)}
+.insight.gold{border-left-color:var(--gold-600);background:var(--gold-100)}
+
+.hero{background:linear-gradient(120deg,var(--surface),var(--surface-2));border:1px solid var(--line)}
+.studenthead{display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+.avatar{width:58px;height:58px;flex:none;border-radius:50%;background:linear-gradient(135deg,#0E2260,#5D5CEF);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;font-family:"Playfair Display",serif}
+.studenthead h3{font-size:22px}
+.timeline{border-left:2px solid var(--line-strong);padding-left:18px}
+.event{position:relative;margin:16px 0}
+.event:before{content:"";width:10px;height:10px;background:var(--gold-500);border-radius:50%;position:absolute;left:-23px;top:5px;box-shadow:0 0 0 3px var(--surface)}
+.event b{color:var(--text)}
+.event .time{color:var(--gold-600);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:2px}
+.twoCol{display:grid;grid-template-columns:1.2fr .8fr;gap:18px}
+
+.flow{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.node{padding:11px 13px;background:var(--surface-2);border:1px solid var(--line-strong);border-radius:11px;font-weight:700;font-size:12.5px;color:var(--text)}
+.arrow{font-size:18px;color:var(--gold-600);flex:none}
+.traitrow{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);gap:10px}
+.traitrow:last-child{border-bottom:0}
+.traitrow>span:first-child{min-width:0}
+.matchcard{border:1px solid var(--line);border-left:5px solid var(--green);border-radius:12px;padding:15px;background:var(--surface);min-width:0}
+.matchcard.explore{border-left-color:var(--orange)}
+.matchcard h4{font-size:15.5px;margin-bottom:8px}
+.footer-note{margin-top:24px;color:var(--muted);font-size:12px;line-height:1.6;border-top:1px solid var(--line);padding-top:16px}
+
+/* ---- Discovery game ---- */
+.stage{max-width:470px;margin:0 auto}
+.stage-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.stage-head h3{margin:0;font-size:18px}
+.dots{display:flex;gap:6px;align-items:center}
+.dots i{width:10px;height:10px;border-radius:50%;background:var(--line-strong);display:block}
+.dots i.done{background:var(--accent)}
+.dots i.skip{background:var(--orange)}
+.dots i.now{background:var(--gold-500);box-shadow:0 0 0 3px var(--gold-100)}
+.sw-wrap{position:relative;height:330px;touch-action:pan-y;user-select:none;-webkit-user-select:none}
+.sw-card{position:absolute;inset:0;border-radius:22px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#fff;text-align:center;padding:24px;cursor:grab;box-shadow:var(--shadow);touch-action:none}
+.sw-e{font-size:88px;line-height:1}
+.sw-t{font-family:"Playfair Display",Georgia,serif;font-size:25px;font-weight:700}
+.sw-s{font-size:14.5px;opacity:.95;max-width:30ch}
+.sw-actions{display:flex;justify-content:center;gap:34px;margin:18px 0 8px}
+.sw-actions button{width:68px;height:68px;border-radius:50%;border:3px solid var(--line-strong);background:var(--surface);font-size:26px;cursor:pointer;line-height:1}
+.sw-actions .sw-yes{border-color:var(--green);color:var(--green)}
+.sw-actions .sw-no{border-color:var(--red);color:var(--red)}
+.q-prompt{text-align:center;margin-bottom:14px}
+.q-e{font-size:68px;line-height:1.05}
+.q-t{font-family:"Playfair Display",Georgia,serif;font-size:21px;font-weight:700;margin-top:8px;text-wrap:balance}
+.opts{display:grid;gap:10px}
+.opt{display:flex;gap:12px;align-items:center;text-align:left;background:var(--surface);border:2px solid var(--line-strong);border-radius:14px;padding:14px 16px;font-size:16px;font-weight:600;cursor:pointer;min-height:58px;color:var(--text)}
+.opt:hover:not(:disabled){border-color:var(--accent)}
+.opt:disabled{cursor:default}
+.opt .oe{font-size:30px;flex:none}
+.opt.picked{border-color:var(--accent);background:var(--accent-soft)}
+.opt.good{border-color:var(--green);background:var(--green-bg)}
+.opt.soft{border-color:var(--orange);background:var(--orange-bg)}
+.fb{margin-top:12px;padding:12px 14px;border-radius:12px;font-size:15px;line-height:1.45;background:var(--surface-2);border:1px solid var(--line)}
+.fb.good{background:var(--green-bg);border-color:var(--green);color:var(--text)}
+.fb.soft{background:var(--orange-bg);border-color:var(--orange);color:var(--text)}
+.seq-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;min-height:84px;margin:12px 0}
+.seq-item{width:76px;height:76px;border-radius:18px;background:var(--surface);border:2px solid var(--line-strong);display:grid;place-items:center;font-size:40px;color:var(--text)}
+.seq-item.slot{border-style:dashed;color:var(--muted);font-size:24px;background:var(--surface-2)}
+.seq-item.ok{border-color:var(--green);background:var(--green-bg)}
+button.seq-item{cursor:pointer}
+button.seq-item:hover{border-color:var(--accent)}
+button.seq-item.shake{animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.between{text-align:center;padding:26px 20px}
+.between .big-e{font-size:76px;line-height:1}
+.between h3{font-size:24px;margin:10px 0 6px}
+.between p{margin:6px auto;max-width:44ch;font-size:15px;line-height:1.55;color:var(--text-dim)}
+.between .row{justify-content:center;margin-top:16px}
+/* read aloud + interest styles */
+.hear{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border-radius:999px;border:1.5px solid var(--accent);background:var(--surface);color:var(--accent);font-weight:700;font-size:14px;cursor:pointer;font-family:inherit}
+.hear:hover{background:var(--surface-2)}
+.hearrow{display:flex;justify-content:center;margin:12px 0 0}
+.seg{display:inline-flex;border:1px solid var(--line-strong);border-radius:9px;overflow:hidden}
+.seg button{padding:9px 16px;border:0;background:var(--surface);color:var(--text);font-weight:600;font-size:14px;cursor:pointer;font-family:inherit}
+.seg button.on{background:var(--accent);color:#fff}
+.code{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 12px}
+.code span{display:inline-flex;align-items:center;gap:6px;padding:8px 14px;border-radius:10px;background:var(--gold-100);color:var(--text);font-weight:700;font-size:15px}
+/* career profile */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:9px 14px;border-radius:999px;border:2px solid var(--line-strong);background:var(--surface);font-weight:600;font-size:14px;cursor:pointer;color:var(--text);font-family:inherit}
+.chip[aria-pressed=true]{border-color:var(--accent);background:var(--accent-soft)}
+.chip.sug{border-style:dashed}
+.field{display:grid;gap:6px;margin-bottom:12px}
+.field label{font-size:13px;font-weight:700}
+.field input[type=text],.field select{padding:11px 12px;border:1.5px solid var(--line-strong);border-radius:10px;background:var(--surface);font-size:15px;width:100%}
+.expcard{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:var(--surface-2)}
+.expcard b{font-size:14.5px}
+.expcard label{display:flex;gap:8px;align-items:center;padding:6px 0;font-size:14px;cursor:pointer}
+.resume{background:#fff;color:#141827;border:1px solid var(--line-strong);border-radius:8px;padding:22px 26px;line-height:1.5;font-size:14px}
+.resume h4{font-family:"Playfair Display",Georgia,serif;font-size:23px;margin:0}
+.resume h5{margin:14px 0 4px;font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;border-bottom:1px solid #cfd3de;padding-bottom:3px;color:#39415a;font-family:Inter,sans-serif}
+.resume ul{margin:4px 0;padding-left:20px}
+.resume .rs{color:#5a6280;font-size:13px}
+.planrow{display:grid;grid-template-columns:130px minmax(0,1fr);gap:12px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+.planrow:last-child{border-bottom:0}
+.planrow .pl{font-weight:700;font-size:14px}
+body.big .chip{font-size:17px;padding:12px 18px}
+body.big .hear{font-size:17px;padding:12px 20px}
+body.big .opt{min-height:74px;font-size:19px}
+body.big .sw-actions button{width:88px;height:88px;font-size:34px}
+body.big .seq-item{width:96px;height:96px;font-size:50px}
+body.big .btn{padding:16px 26px;font-size:17px}
+
+/* ---- Results ---- */
+.meter{padding:12px 0;border-bottom:1px solid var(--line)}
+.meter:last-child{border-bottom:0}
+.meter-top{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.mname{font-weight:700;font-size:14.5px}
+.bar{height:12px;border-radius:99px;background:var(--line);overflow:hidden}
+.bar i{display:block;height:100%;border-radius:99px;background:var(--accent)}
+.path{border:1px solid var(--line);border-radius:14px;padding:18px;background:var(--surface);min-width:0}
+.path+.path{margin-top:14px}
+.path-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.path-head h4{font-size:19px}
+.path .why{font-size:13.5px;color:var(--text-dim);margin:8px 0 0;line-height:1.5}
+.tri{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:14px}
+.tri .lab{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;color:var(--gold-600);margin-bottom:6px}
+.tri ul{margin:0;padding-left:18px;font-size:13.5px;line-height:1.65;color:var(--text)}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.tile{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:14px}
+.tile .k{font-size:11.5px;color:var(--muted);font-weight:700;letter-spacing:.05em;text-transform:uppercase}
+.tile .v{font-family:"Playfair Display",serif;font-size:28px;font-weight:800;margin-top:4px}
+.empty{padding:26px 18px;text-align:center;color:var(--text-dim);border:1px dashed var(--line-strong);border-radius:14px;background:var(--surface-2);line-height:1.6}
+.lock{padding:22px 18px;border-radius:14px;background:var(--orange-bg);border:1px solid var(--orange);color:var(--text);line-height:1.6}
+.lock b{display:block;margin-bottom:4px;color:var(--orange)}
+
+/* ---- Toggles, sliders ---- */
+.toggle{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--line)}
+.toggle:last-child{border-bottom:0}
+.toggle .tt{min-width:0}
+.toggle .tt b{display:block;font-size:14.5px}
+.toggle .tt span{display:block;font-size:13px;color:var(--text-dim);margin-top:2px;line-height:1.45}
+.sw{position:relative;flex:none;width:50px;height:28px}
+.sw input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.sw .trk{position:absolute;inset:0;border-radius:99px;background:var(--line-strong);transition:background .15s}
+.sw .trk:after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:transform .15s;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.sw input:checked+.trk{background:var(--accent)}
+.sw input:checked+.trk:after{transform:translateX(22px)}
+.sw input:focus-visible+.trk{outline:2px solid var(--accent);outline-offset:2px}
+.rule{padding:14px 0;border-bottom:1px solid var(--line)}
+.rule:last-child{border-bottom:0}
+.rule-top{display:flex;justify-content:space-between;gap:10px;align-items:baseline;flex-wrap:wrap}
+.rule-top b{font-size:14.5px}
+.rule output{font-weight:800;color:var(--accent);font-size:15px}
+.rule p{margin:4px 0 8px;font-size:13px;color:var(--text-dim);line-height:1.45}
+input[type=range]{width:100%;accent-color:var(--accent)}
+pre.raw{background:var(--surface-2);border:1px solid var(--line);border-radius:10px;padding:12px;font-size:12px;line-height:1.5;overflow:auto;max-height:260px;margin:10px 0 0;color:var(--text-dim)}
+.sim{background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:16px}
+.sim .out{margin-top:10px;font-size:14.5px;line-height:1.5}
+
+/* ---- Cohort chart ---- */
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12.5px;color:var(--text-dim);margin-bottom:10px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.hb{display:grid;grid-template-columns:minmax(110px,170px) minmax(0,1fr);gap:8px 14px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line)}
+.hb:last-child{border-bottom:0}
+.hb .nm{font-size:13.5px;font-weight:600;min-width:0}
+.hb .bars{display:grid;gap:5px;min-width:0}
+.hb .ln{display:flex;align-items:center;gap:8px}
+.hb .ln .trk{flex:1;height:11px;background:transparent;min-width:0}
+.hb .ln .trk i{display:block;height:100%;border-radius:0 4px 4px 0;min-width:2px}
+.hb .ln .num{font-size:12.5px;font-weight:700;min-width:22px;color:var(--text)}
+.rolecards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.rolecard{border:1px solid var(--line);border-radius:14px;padding:16px;background:var(--surface);display:flex;flex-direction:column;gap:8px;min-width:0}
+.rolecard h4{font-size:17px}
+.rolecard p{margin:0;font-size:13.5px;color:var(--text-dim);line-height:1.5;flex:1}
+.mx td,.mx th{text-align:center}
+.mx td:first-child,.mx th:first-child{text-align:left}
+
+@media(max-width:1000px){
+  .app{grid-template-columns:1fr}
+  .side{height:auto;position:relative;padding:12px 14px}
+  .brand{margin-bottom:10px}
+  .roles{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:10px}
+  .role{min-width:0;width:100%;padding:7px 9px}
+  .nav{flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:4px}
+  .nav button{min-width:max-content;width:auto;padding:8px 12px;background:rgba(255,255,255,.07)}
+  .side-foot{display:none}
+  .g4,.g3,.g2,.twoCol,.gaps,.tri{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr 1fr}
+  .main{padding:16px 14px 40px}
+  .pill{white-space:normal}
+}
+@media(max-width:700px){
+  .tablewrap{border:0;overflow:visible}
+  table.stack{min-width:0;width:100%;display:block}
+  table.stack thead{display:none}
+  table.stack tbody{display:block}
+  table.stack tr{display:block;border:1px solid var(--line);border-radius:12px;padding:8px 12px;margin-bottom:10px;background:var(--surface)}
+  table.stack td{display:block;border:0;padding:5px 0;text-align:left!important}
+  table.stack td[data-label]:before{content:attr(data-label);display:block;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text-dim);margin-bottom:1px}
+  table.stack td:first-child{font-weight:700}
+}
+@media(max-width:520px){
+  .planrow{grid-template-columns:1fr;gap:4px}
+  .hb{grid-template-columns:1fr}
+  .sw-wrap{height:300px}
+  .sw-e{font-size:72px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="app">
+<aside class="side">
+  <div class="brand"><div class="logo"></div><div><h1>ORBIT</h1><small>Transition Services</small></div></div>
+  <div class="sidelabel">Viewing as</div>
+  <div class="roles" id="roles"></div>
+  <div class="sidelabel">Pages</div>
+  <nav class="nav" id="nav"></nav>
+  <div class="side-foot">GAPS™ Readiness Framework<br>Growth · Advancement · Performance · Strategic Risk<br><br>Prepared for: Office of Business Opportunities, Polk County Public Schools</div>
+</aside>
+<main class="main">
+  <div class="demobar"><a href="index.html" style="color:inherit;font-weight:700;text-decoration:none;border-bottom:1px dashed var(--muted);margin-right:10px;white-space:nowrap">&larr; theorbitsuite.com</a><span id="demoStatus">Demo with illustrative data. Maya R. is a composite student, not a real one.</span><span class="row"><button class="btn secondary sm" id="resetBtn" type="button">Reset demo data</button></span></div>
+  <div class="topbar"><div class="title"><h2 id="pageTitle">Overview</h2><p id="pageSub">A pilot concept for Juniors &amp; Seniors transitioning to employment</p></div><span class="pill" id="rolePill">Discussion Draft — Not Yet Priced</span></div>
+
+
+
+
+<section id="matching" class="section">
+  <div class="card"><h3>Opportunity Matching</h3>
+  <p class="small muted" style="margin-top:-6px">ORBIT surfaces evidence-based alignment, combining the readiness profile with Discovery game results. Final decisions remain with the student, family, school team, and employer.</p>
+  <div id="mtBody" style="margin-top:14px"></div>
+  </div>
+  <div class="card" style="margin-top:18px"><h3>Live &amp; local opportunities</h3>
+  <p class="small muted" style="margin-top:-6px">Real Polk County programs, events and openings, from public web pages read on September 29, 2026. Fit reads from Maya's game results. Nothing here has been confirmed with these organizations for ORBIT students, so check dates and eligibility before sharing with a family.</p>
+  <div id="mtLiveBody" style="margin-top:14px"></div>
+  </div>
+</section>
+
+<section id="support" class="section">
+  <div class="card"><h3>Support team for Maya</h3>
+  <p class="small muted" style="margin-top:-6px">Every support has a named owner. In the pilot the school enters the names. Here the roles show who would be assigned.</p>
+  <div class="tablewrap"><table><thead><tr><th>Role</th><th>Assigned to</th><th>Responsible for</th></tr></thead><tbody>
+    <tr><td><b>ESE teacher of record</b></td><td><span class="tag plain">Name entered by school</span></td><td>Daily supports, IEP goals, and the entries below</td></tr>
+    <tr><td><b>Transition coordinator</b></td><td><span class="tag plain">Name entered by school</span></td><td>Transition plan, agency referrals, and school-to-work timing</td></tr>
+    <tr><td><b>Paraprofessional</b></td><td><span class="tag plain">Name entered by school</span></td><td>In-class prompts and visual task steps</td></tr>
+    <tr><td><b>Job coach</b></td><td><span class="tag plain">Name entered by school or agency</span></td><td>On-site support during job shadows and work experiences</td></tr>
+    <tr><td><b>TRC career coach</b></td><td><span class="tag gold">The Resume Chic &amp; Co.</span></td><td>Resume, cover letter, LinkedIn and interview sessions</td></tr>
+    <tr><td><b>Office of Business Opportunities</b></td><td><span class="tag purple">Sherrita's office</span></td><td>Matching to work-based learning and partner introductions</td></tr>
+    <tr><td><b>Parent or guardian</b></td><td><span class="tag plain">Family</span></td><td>Consent, home practice, and approval before anything is shared</td></tr>
+  </tbody></table></div></div>
+  <div class="card" style="margin-top:18px"><h3>Support Journey — illustrative</h3>
+  <p class="small muted" style="margin-top:-6px">The same kind of week-to-week record ESE teachers already keep in scattered emails, shown here as one continuous, dated trail. Each entry shows who was assigned.</p>
+  <div class="timeline" style="margin-top:14px">
+    <div class="event"><span class="time">Sept 8</span><b>Observed struggle:</b> Hesitant during unfamiliar group task.<div class="small muted">Logged by: ESE teacher of record</div></div>
+    <div class="event"><span class="time">Sept 8</span><b>Support provided:</b> Staff clarified role and gave visual task steps.<div class="small muted">Assigned: Paraprofessional</div></div>
+    <div class="event"><span class="time">Sept 9</span><b>Student response:</b> Completed task with one prompt; remained engaged.<div class="small muted">Logged by: Paraprofessional</div></div>
+    <div class="event"><span class="time">Sept 15</span><b>What happened next:</b> Similar task repeated with reduced prompting.<div class="small muted">Assigned: ESE teacher of record</div></div>
+    <div class="event"><span class="time">Sept 15</span><b>Follow-up result:</b> Completed independently. Confidence improved.<div class="small muted">Logged by: ESE teacher of record</div></div>
+  </div></div>
+  <div class="card" style="margin-top:18px"><h3>Open actions</h3>
+  <p class="small muted" style="margin-top:-6px">Next steps that came out of the trail. Each has an owner and a due date.</p>
+  <div class="tablewrap"><table><thead><tr><th>Action</th><th>Assigned to</th><th>Due</th><th>Status</th></tr></thead><tbody>
+    <tr><td>Repeat an unfamiliar group task with visual steps only</td><td>ESE teacher of record</td><td>Oct 6</td><td><span class="tag orange">Open</span></td></tr>
+    <tr><td>Review the Career Profile with Maya and her family</td><td>Transition coordinator</td><td>Oct 13</td><td><span class="tag orange">Open</span></td></tr>
+    <tr><td>Invite Maya to the next Resume Foundations webinar</td><td>TRC career coach</td><td>Oct 20</td><td><span class="tag orange">Open</span></td></tr>
+    <tr><td>Set up a design or print shop job shadow, with family approval</td><td>Office of Business Opportunities</td><td>Nov 3</td><td><span class="tag plain">Waiting on family approval</span></td></tr>
+    <tr><td>Confirm a job coach for the job shadow</td><td>Job coach (school or agency)</td><td>Nov 3</td><td><span class="tag plain">Not assigned yet</span></td></tr>
+  </tbody></table></div>
+  <p class="small muted" style="margin:12px 0 0">Illustrative entries. Dates and assignments are examples, not real records.</p></div>
+</section>
+
+<section id="careerprep" class="section">
+  <div class="notice blue">The Resume Chic &amp; Co. career-services sessions connect directly to the pilot. Attendance shows on the Readiness Dashboard.</div>
+  <div class="grid g3" style="margin-top:16px">
+    <div class="card"><h3>Resume Foundations</h3><p style="font-size:14px;line-height:1.6">Translate school, volunteer, project, and CTE experience into a student-ready resume.</p><span class="tag green">Scheduled</span></div>
+    <div class="card"><h3>Interview Practice</h3><p style="font-size:14px;line-height:1.6">Practice common questions, self-advocacy, and asking for clarification when needed.</p><span class="tag orange">Upcoming</span></div>
+    <div class="card"><h3>Workplace Readiness</h3><p style="font-size:14px;line-height:1.6">Communication, expectations, professional behavior, follow-through, and confidence.</p><span class="tag">TRC Module</span></div>
+  </div>
+</section>
+
+<section id="employers" class="section">
+  <div class="card"><h3>Partner Map — Polk County</h3>
+  <p class="muted" style="font-size:14px;margin-top:-6px">Real organizations that already work with students and adults with disabilities in Polk County, from their public web pages (checked September 2026). None has been contacted about ORBIT. Only Lakeland Regional Health hosts students on site. The rest are agencies and programs that can refer, fund or train. Community employers still need to be recruited, and the cohort dashboard shows where. The fit column reads from the Discovery game results.</p>
+  <div class="tablewrap" style="margin-top:12px"><table><thead><tr><th>Partner</th><th>What they offer</th><th>Type</th><th>Fit with Maya's results</th><th>Status</th></tr></thead><tbody id="bizRows"></tbody></table></div>
+  </div>
+  <div class="grid g2" style="margin-top:18px">
+    <div class="card"><h3>Funding and pathways</h3>
+      <div class="insight gold"><b>On-the-job training.</b> CareerSource Polk's employer page says it reimburses "up to 50 or 75%" of wages during training. Sherrita mentioned roughly $15,000 per employer, but the page lists no dollar figure and does not mention students with disabilities. Confirm the current terms and eligibility before quoting it to employers.</div>
+      <div class="insight gold"><b>SEU Link.</b> A parallel, non-employer pathway in Lakeland for students ages 18 to 30 with documented intellectual disability, aimed at employment and independent living. Fall applications close December 15, so this year's seniors have a deadline. It fits only students who meet the eligibility rules.</div>
+    </div>
+    <div class="card"><h3>What ORBIT still needs from Polk County</h3>
+      <ul style="font-size:13.5px;line-height:1.8;padding-left:18px;color:var(--text-dim)">
+        <li>Rough count of juniors/seniors in the transition population (unknown as of the call — worth pinning down early)</li>
+        <li>Which grading platform and IEP system are already in use, to plan the data pull</li>
+        <li>Introduction to the ESE Director and Internship Department for the next conversation</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!-- New role pages, filled by script -->
+<section id="s-home" class="section"></section>
+<section id="s-play" class="section"></section>
+<section id="s-results" class="section"></section>
+<section id="s-support" class="section"></section>
+<section id="s-profile" class="section"></section>
+<section id="s-ready" class="section"></section>
+<section id="p-home" class="section"></section>
+<section id="p-results" class="section"></section>
+<section id="p-paths" class="section"></section>
+<section id="p-consent" class="section"></section>
+<section id="p-how" class="section"></section>
+<section id="p-support" class="section"></section>
+<section id="p-profile" class="section"></section>
+<section id="p-ready" class="section"></section>
+<section id="o-cohort" class="section"></section>
+<section id="o-profile" class="section"></section>
+<section id="o-ready" class="section"></section>
+
+</main>
+</div>
+<script>
+/* ================= helpers ================= */
+const $=(s,r=document)=>r.querySelector(s);
+const $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const sum=a=>a.reduce((s,x)=>s+x,0);
+const mean=a=>a.length?sum(a)/a.length:0;
+const shuffle=a=>{const b=a.slice();for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]]}return b};
+const mmss=ms=>{const s=Math.round(ms/1000);return Math.floor(s/60)+':'+String(s%60).padStart(2,'0')};
+const nowStr=()=>{const d=new Date();return d.toLocaleDateString('en-US',{month:'short',day:'numeric'})+', '+d.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'})};
+
+/* ================= career clusters ================= */
+const CL=[
+ {id:'retail',name:'Retail, Marketing & Brand',short:'retail and brand',ic:'🛍️',
+  careers:['Sales associate','Visual merchandiser','Stock and display assistant','Boutique team lead'],
+  wbl:['Job shadow at a local store','School store or pop-up shop internship','Part-time retail role with on-the-job training support'],
+  seu:['BS Marketing','BS Business Studies','BS Management','BS International Business'],
+  support:'Customer-facing tolerance; predictable shifts'},
+ {id:'business',name:'Business, Finance & Operations',short:'business and organizing',ic:'📊',
+  careers:['Inventory or stock assistant','Office and records assistant','Bookkeeping clerk','Operations coordinator'],
+  wbl:['Job shadow in a business office','Inventory or records internship (library, clinic, warehouse)','Supported part-time office role'],
+  seu:['BS Accounting','BS Finance','BS Business Studies','BS Management','Bachelor of Business Administration (BBA)'],
+  support:'Clear task sequencing'},
+ {id:'hospitality',name:'Hospitality, Tourism & Sport',short:'hospitality',ic:'🍽️',
+  careers:['Kitchen or catering assistant','Hotel guest services','Event and venue staff','Sports facility team member'],
+  wbl:['Job shadow at a hotel or restaurant','Catering or event crew placement','Part-time food service role with training'],
+  seu:['BS Tourism & Hospitality Management','BS Sport Management'],
+  support:'Customer-facing tolerance; fast pace at peak times'},
+ {id:'media',name:'Media, Design & Communication',short:'design and media',ic:'🎨',
+  careers:['Print and visual design support','Social media assistant','Video or photo assistant','Sign and display maker'],
+  wbl:['Job shadow at a print or design shop','Design internship for a school or nonprofit','Portfolio project with a local business'],
+  seu:['BS Digital Media & Design','BS Digital Design & Production','BA/BS Film Production','BA/BS Public Relations','BA/BS Multimedia Journalism'],
+  support:'On-site trial to confirm sustained interest'},
+ {id:'health',name:'Healthcare',short:'healthcare',ic:'🩺',
+  careers:['Healthcare supply support','Patient greeter or transport helper','Sterile processing helper','Nursing (with more schooling)'],
+  wbl:['Job shadow at a clinic or hospital','Volunteer program at a care facility','Supply room or front desk trial'],
+  seu:['Associate Degree in Nursing','Other health programs (confirm current list with SEU)'],
+  support:'Workplace communication orientation'},
+ {id:'helping',name:'Helping Professions & Education',short:'helping and education',ic:'🤝',
+  careers:['Teacher aide','Childcare assistant','Community service assistant','Peer support worker'],
+  wbl:['Job shadow in a classroom or daycare','Volunteer with a community program','Classroom assistant trial'],
+  seu:['BS Psychology','Bachelor of Social Work (BSW)','BS Human Services','BS Elementary Education','BS Exceptional Student Education (4+1)'],
+  support:'Coaching on boundaries and self-advocacy'},
+ {id:'tech',name:'Technology, Data & Cyber',short:'technology',ic:'💻',
+  careers:['IT help desk helper','Data entry and cleanup','Computer lab assistant','Cybersecurity (with more schooling)'],
+  wbl:['Job shadow in an IT office','Help desk internship at school or a small business','Coding or data club project'],
+  seu:['BBA Cybersecurity','BBA Data Science','BBA Software Development',"Abridged Bachelor's in Computer Science"],
+  support:'Clear written steps'},
+ {id:'hands',name:'Hands-On, Trades & Aviation',short:'hands-on work',ic:'🔧',
+  careers:['Facilities and maintenance assistant','Landscaping or garden crew','Assembly and build helper','Aviation ground crew (with more training)'],
+  wbl:['Job shadow with a trades crew','Garden center or maintenance placement','Pre-apprenticeship trial'],
+  seu:['SEU Trades programs (confirm current list)','AAS Aviation / Professional Pilot','BS Aviation Management'],
+  support:'Safety training and visual task cues'}
+];
+const CLM=Object.fromEntries(CL.map(c=>[c.id,c]));
+/* ================= RIASEC interest styles ================= */
+const RI=[
+ {id:'R',name:'Realistic',stu:'Hands-on doer',ic:'🔧',d:'Likes building, fixing, moving around and working with tools.',next:'Try a short job shadow with a trades crew, or a build project.'},
+ {id:'I',name:'Investigative',stu:'Figure-it-out thinker',ic:'🔍',d:'Likes solving problems and finding out how things work.',next:'Try a help desk or data clean-up task.'},
+ {id:'A',name:'Artistic',stu:'Creative maker',ic:'🎨',d:'Likes making things and coming up with ideas.',next:'Try a design project for a school or a nonprofit.'},
+ {id:'S',name:'Social',stu:'Helper',ic:'🤝',d:'Likes helping, teaching and working with people.',next:'Try volunteering in a classroom, care facility or community program.'},
+ {id:'E',name:'Enterprising',stu:'Leader and persuader',ic:'📣',d:'Likes leading, selling and getting people excited.',next:'Try a school store shift or an event crew role.'},
+ {id:'C',name:'Conventional',stu:'Organizer',ic:'🗂️',d:'Likes order, clear steps and checking details.',next:'Try an inventory or records task.'}
+];
+const RIM=Object.fromEntries(RI.map(r=>[r.id,r]));
+/* how strongly each career area draws on each interest style */
+const CLRI={retail:{E:1,S:.5,A:.3},business:{C:1,E:.4},hospitality:{S:1,E:.5,R:.3},media:{A:1,E:.3},health:{S:1,I:.6,R:.3},helping:{S:1,A:.2,I:.2},tech:{I:1,R:.5,C:.4},hands:{R:1,C:.3}};
+const RI_NOTE='Interest styles show what a student enjoys. A lower score means the games did not show that interest yet. It is not read as inability, and it is never a diagnosis.';
+const SEU_TRANSITION='SEU Link, in Lakeland: a comprehensive transition program for students ages 18 to 30 with documented intellectual disability, covering employability, independent living and self-advocacy. Fall applications close December 15. Confirm eligibility and cost with SEU.';
+
+/* ================= games ================= */
+const GAMES=[
+ {id:'g2',name:'A Day at Work',type:'swipe',mixed:true,e:'💼',blurb:'Picture yourself doing each job. Tap ♥ if you would want to try it.',what:'Time on each job card, one card per career cluster',serves:{retail:.125,business:.125,hospitality:.125,media:.125,health:.125,helping:.125,tech:.125,hands:.125},
+  deck:[
+   {e:'🍳',t:'Cook a lunch rush',s:'Fast, hot and busy',c:'hospitality',g:['#B8651F','#6E3508']},
+   {e:'🩺',t:'Help a patient feel better',s:'Calm and caring',c:'health',g:['#1C8A72','#0B4D40']},
+   {e:'💻',t:'Fix a computer problem',s:'Solve it step by step',c:'tech',g:['#2A7BB0','#123F66']},
+   {e:'🔧',t:'Build a shelf',s:'Measure, cut and fasten',c:'hands',g:['#6B7A2A','#3B4512']},
+   {e:'🎬',t:'Edit a video',s:'Cut clips and add music',c:'media',g:['#7B3FC4','#42207A']},
+   {e:'🛒',t:'Run the register',s:'Greet people and ring them up',c:'retail',g:['#C2417C','#7A1F4F']},
+   {e:'📦',t:'Count and organize inventory',s:'Everything in its place',c:'business',g:['#2F4FB8','#152A6B']},
+   {e:'🧸',t:'Help a child learn',s:'Patient and playful',c:'helping',g:['#B4691A','#6E3F08']}]},
+ {id:'g3',name:'Sort the Stock',type:'quiz',e:'📦',blurb:'Put each item in the right bin.',what:'Accuracy sorting items into bins',serves:{business:.8,hands:.2},
+  rounds:[
+   {e:'🍎',q:'Where does the apple go?',opts:[{e:'🥬',t:'Food',ok:1},{e:'🧴',t:'Cleaning and care'},{e:'📚',t:'School and books'}]},
+   {e:'🧽',q:'Where does the sponge go?',opts:[{e:'🥬',t:'Food'},{e:'🧴',t:'Cleaning and care',ok:1},{e:'📚',t:'School and books'}]},
+   {e:'📖',q:'Where does the storybook go?',opts:[{e:'🥬',t:'Food'},{e:'🧴',t:'Cleaning and care'},{e:'📚',t:'School and books',ok:1}]},
+   {e:'🥛',q:'Where does the milk go?',opts:[{e:'🥬',t:'Food',ok:1},{e:'🧴',t:'Cleaning and care'},{e:'📚',t:'School and books'}]},
+   {e:'✏️',q:'Where do the pencils go?',opts:[{e:'🥬',t:'Food'},{e:'🧴',t:'Cleaning and care'},{e:'📚',t:'School and books',ok:1}]}]},
+ {id:'g4',name:'Poster Studio',type:'quiz',pref:true,e:'🖼️',blurb:'Make a poster. Pick what you like best. There are no wrong answers.',what:'Design choices: purpose, colors, layout',serves:{media:.7,retail:.3},
+  rounds:[
+   {e:'🖼️',q:'What are you making?',opts:[
+     {e:'🛍️',t:'A sale sign for a shop',pts:{retail:90,media:70},ri:{E:85,A:65}},
+     {e:'🎸',t:'A poster for a band',pts:{media:92},ri:{A:92}},
+     {e:'🏫',t:'A flyer for a school event',pts:{media:78,helping:62},ri:{A:75,S:65}}]},
+   {e:'🎨',q:'Pick your colors.',opts:[
+     {e:'🟥',t:'Bold and bright',pts:{media:88,retail:75},ri:{A:85,E:70}},
+     {e:'🟦',t:'Cool and calm',pts:{media:80,health:60},ri:{A:75,S:60}},
+     {e:'⬛',t:'Clean black and white',pts:{media:75,business:65},ri:{A:70,C:70}}]},
+   {e:'📐',q:'Pick a layout.',opts:[
+     {e:'🖼️',t:'One big picture',pts:{media:90},ri:{A:90}},
+     {e:'🔤',t:'Big bold words',pts:{retail:85,media:75},ri:{E:85,A:65}},
+     {e:'🧩',t:'Lots of small pieces',pts:{media:70,business:75},ri:{C:80,A:60}}]}]},
+ {id:'g5',name:'Kitchen Rush',type:'seq',e:'🥪',blurb:'Watch the order, then tap the food in the same order.',what:'Remembering a sequence, first-try accuracy',serves:{hospitality:1},
+  rounds:[{q:'Make the sandwich',items:['🍞','🧀','🥬']},{q:'A bigger order',items:['🍞','🥩','🧀','🍅']}]},
+ {id:'g6',name:'Triage',type:'quiz',e:'🚑',blurb:'Three people are waiting. Pick who needs help first.',what:'Accuracy on who needs help first',serves:{health:1},
+  rounds:[
+   {e:'🚑',q:'Who needs help first?',opts:[{e:'🤕',t:'Hurt arm, cannot move it',ok:1},{e:'🤧',t:'Sneezing'},{e:'🥱',t:'Sleepy'}]},
+   {e:'🚑',q:'Who needs help first?',opts:[{e:'🦶',t:'Sore toe'},{e:'😮‍💨',t:'Trouble breathing',ok:1},{e:'😴',t:'Wants a blanket'}]},
+   {e:'🚑',q:'Who needs help first?',opts:[{e:'💅',t:'Chipped nail'},{e:'🎧',t:'Bored'},{e:'🤒',t:'Very hot and dizzy',ok:1}]}]},
+ {id:'g7',name:'Calm the Customer',type:'quiz',pref:true,e:'🙂',blurb:'Pick what you would do. Some answers are kinder than others.',what:'Choices in customer and coworker moments',serves:{helping:.7,retail:.15,hospitality:.15},
+  rounds:[
+   {e:'😠',q:'A customer says, "This is broken!"',opts:[
+     {e:'🙂',t:'Listen and say, "I am sorry. Let me help."',pts:{helping:95,retail:85,hospitality:85},ri:{S:95,E:70}},
+     {e:'🧑‍💼',t:'Go get a manager right away',pts:{helping:65,retail:70,business:60},ri:{E:65,C:60,S:50}},
+     {e:'🙄',t:'Say it is not your problem',pts:{helping:5,retail:10,hospitality:10},ri:{S:5}}]},
+   {e:'😟',q:'A new coworker looks lost.',opts:[
+     {e:'🚶',t:'Show them around',pts:{helping:95,hospitality:75},ri:{S:95}},
+     {e:'👀',t:'Wait and see',pts:{helping:45},ri:{S:45}},
+     {e:'🤷',t:'Let them figure it out',pts:{helping:10},ri:{S:10}}]},
+   {e:'⏳',q:'The line is getting long.',opts:[
+     {e:'😊',t:'Smile and call for backup',pts:{retail:90,hospitality:85,business:70},ri:{E:85,S:70}},
+     {e:'⚡',t:'Work faster on your own',pts:{retail:70,hospitality:65},ri:{E:70,C:60}},
+     {e:'🚪',t:'Walk away',pts:{retail:5,hospitality:5},ri:{E:5}}]}]},
+ {id:'g8',name:'Spot the Scam',type:'quiz',e:'🕵️',blurb:'Two choices each time. Pick the one that looks like a scam or is not safe.',what:'Accuracy spotting scams and weak passwords',serves:{tech:1},
+  rounds:[
+   {e:'📱',q:'Which message looks like a scam?',opts:[{e:'🎁',t:'"You WON a free phone! Click now!"',ok:1},{e:'📅',t:'"Your class schedule for Monday"'}]},
+   {e:'🔐',q:'Which password is safer?',opts:[{e:'🔓',t:'password123'},{e:'🔒',t:'Blue!Tiger!Runs!47',ok:1}]},
+   {e:'🔗',q:'Which website address looks fake?',opts:[{e:'✅',t:'amazon.com'},{e:'⚠️',t:'amaz0n-login.co',ok:1}]}]},
+ {id:'g9',name:'Build It in Order',type:'quiz',e:'🧰',blurb:'Pick the right step for the job.',what:'Accuracy choosing the right step in a task',serves:{hands:1},
+  rounds:[
+   {e:'🧱',q:'You are hanging a shelf. What comes first?',opts:[{e:'🔨',t:'Hammer the nails'},{e:'📏',t:'Measure and mark the wall',ok:1},{e:'🎨',t:'Paint it'}]},
+   {e:'🪚',q:'You are about to cut wood. What do you put on?',opts:[{e:'🥽',t:'Safety glasses',ok:1},{e:'🧤',t:'Oven mitts'},{e:'🎧',t:'Headphones'}]},
+   {e:'🧹',q:'The job is done. What next?',opts:[{e:'📱',t:'Check your phone'},{e:'😴',t:'Take a nap'},{e:'🧹',t:'Clean up and put tools away',ok:1}]}]},
+ {id:'g10',name:'Pick Your Day',type:'quiz',pref:true,e:'🗓️',blurb:'Pick what sounds best to you. There are no wrong answers.',what:'Choices about how you like to spend a day and what role you take',serves:{retail:.125,business:.125,hospitality:.125,media:.125,health:.125,helping:.125,tech:.125,hands:.125},
+  rounds:[
+   {e:'🌤️',q:'It is a free Saturday. What do you want to do?',opts:[
+     {e:'🔧',t:'Fix or build something',pts:{hands:90,tech:60},ri:{R:95}},
+     {e:'🧪',t:'Figure out how something works',pts:{tech:88,health:62},ri:{I:95}},
+     {e:'🎨',t:'Make something creative',pts:{media:92,retail:60},ri:{A:95}},
+     {e:'🤝',t:'Help someone with something',pts:{helping:92,health:75},ri:{S:95}}]},
+   {e:'👥',q:'Your team gets a big job. What do you take?',opts:[
+     {e:'📣',t:'Lead and get people excited',pts:{retail:82,hospitality:68,helping:60},ri:{E:95}},
+     {e:'🗂️',t:'Keep the plan and lists in order',pts:{business:90,tech:55},ri:{C:95}},
+     {e:'🛠️',t:'Do the hands-on part',pts:{hands:85,hospitality:60},ri:{R:90}},
+     {e:'💡',t:'Come up with the ideas',pts:{media:80,tech:60},ri:{A:85,I:65}}]},
+   {e:'🏢',q:'Which work day sounds best?',opts:[
+     {e:'🗃️',t:'Same steps, everything neat and checked',pts:{business:85,tech:58},ri:{C:95}},
+     {e:'🛍️',t:'Talking with lots of new people',pts:{retail:88,hospitality:82,helping:65},ri:{E:80,S:75}},
+     {e:'🔍',t:'One tricky puzzle to solve',pts:{tech:88,health:55},ri:{I:95}},
+     {e:'🌿',t:'Outside and moving around',pts:{hands:85,hospitality:52},ri:{R:85}}]}]}
+];
+const GM=Object.fromEntries(GAMES.map(g=>[g.id,g]));
+
+/* ================= career profile data ================= */
+const STR=[
+ {id:'reliable',e:'⏰',t:'Reliable and on time'},{id:'organized',e:'🗂️',t:'Organized'},{id:'details',e:'🔎',t:'Careful with details'},
+ {id:'friendly',e:'😊',t:'Friendly'},{id:'patient',e:'🕊️',t:'Patient'},{id:'listen',e:'👂',t:'Good listener'},
+ {id:'creative',e:'🎨',t:'Creative'},{id:'hands',e:'🛠️',t:'Good with my hands'},{id:'solve',e:'🧩',t:'Solves problems'},
+ {id:'team',e:'🤝',t:'Works well on a team'},{id:'learn',e:'🌱',t:'Learns new things'},{id:'finish',e:'✅',t:'Finishes what I start'}
+];
+const STR_M=Object.fromEntries(STR.map(x=>[x.id,x]));
+const STR_SUG={R:['hands'],I:['solve'],A:['creative'],S:['patient','listen'],E:['friendly','team'],C:['organized','details']};
+const EXPS=[
+ {id:'store',e:'🛍️',t:'School store helper',tasks:['Stocked shelves','Helped customers','Counted money at the register','Kept the display neat']},
+ {id:'class',e:'🏫',t:'Classroom helper',tasks:['Handed out papers','Set up materials','Helped classmates','Cleaned up at the end']},
+ {id:'cafe',e:'🍽️',t:'Cafeteria or kitchen helper',tasks:['Served food','Wiped tables','Followed food safety steps','Set up trays']},
+ {id:'vol',e:'🤝',t:'Volunteer work',tasks:['Helped at an event','Packed boxes','Welcomed people','Cleaned up after']},
+ {id:'home',e:'🏠',t:'Helping at home or family',tasks:['Looked after a younger child','Cooked simple meals','Did laundry and chores','Kept to a schedule']},
+ {id:'yard',e:'🌿',t:'Yard or garden work',tasks:['Watered plants','Raked and bagged leaves','Used tools safely','Kept the work area tidy']},
+ {id:'club',e:'🎬',t:'Club, team or art project',tasks:['Made posters or art','Practiced with a team','Showed up on time','Helped set up']}
+];
+const EXPM=Object.fromEntries(EXPS.map(x=>[x.id,x]));
+const PLAN_SLOTS=[{k:'y1',l:'This year',q:'One way to try work this year'},{k:'y2',l:'Next year',q:'One step for next year'},{k:'y3',l:'After graduation',q:'What I want to explore after graduation'}];
+const PROF_SECTIONS=[{k:'str',t:'My strengths'},{k:'res',t:'My resume'},{k:'plan',t:'My future plan'}];
+const blankProfile=()=>({name:'',school:'',str:[],exp:{},plan:{y1:'',y2:'',y3:''}});
+
+/* ================= rules, state, seed ================= */
+const R0={instantMs:500,dwellMs:3000,skipScore:30,perSession:6,hearAllowMs:2000,useBaseline:true,strongMin:75,exploreMin:58};
+const R={...R0};
+const S={profile:null,profOff:{},profLogged:false,ready:null,trkOff:{},readyLogged:false,role:'partner',page:{},games:{},order:[],baseline:null,live:false,session:{active:false,finished:false},preview:null,
+  consent:{team:true,obo:true,employers:false,cohort:true},acc:{big:false,extra:false,hear:false,auto:false,rate:'normal',by:''},disabled:{},audit:[],rawOpen:false,delArmed:false};
+
+const SEED={
+ profile:{name:'Maya R.',school:'Polk County high school, grade 11',str:['reliable','organized','details','friendly'],exp:{store:[0,1,3],class:[0,2]},plan:{y1:'Job shadow at a print or design shop',y2:'Part-time job: Print and visual design support',y3:'BS Digital Media & Design'}},
+ baseline:1400,
+ order:['g2','g10','g3','g4','g9','g6'],
+ games:{
+  g2:{status:'played',ms:62000,cards:[{i:0,dwell:800,act:'pass'},{i:1,dwell:350,act:'pass'},{i:2,dwell:2200,act:'like'},{i:3,dwell:3600,act:'like'},{i:4,dwell:5200,act:'like'},{i:5,dwell:3100,act:'pass'},{i:6,dwell:3300,act:'like'},{i:7,dwell:1200,act:'pass'}]},
+  g10:{status:'played',ms:44000,rounds:[{i:0,pick:2,ok:false,rt:4200},{i:1,pick:0,ok:false,rt:3800},{i:2,pick:1,ok:false,rt:4600}]},
+  g3:{status:'played',ms:71000,rounds:[{i:0,pick:0,ok:true,rt:2600},{i:1,pick:1,ok:true,rt:3100},{i:2,pick:2,ok:true,rt:2400},{i:3,pick:1,ok:false,rt:4800},{i:4,pick:2,ok:true,rt:2900}]},
+  g4:{status:'played',ms:54000,rounds:[{i:0,pick:1,ok:false,rt:5200},{i:1,pick:0,ok:false,rt:4100},{i:2,pick:0,ok:false,rt:3600}]},
+  g9:{status:'played',ms:39000,rounds:[{i:0,pick:1,ok:true,rt:3300},{i:1,pick:0,ok:true,rt:2800},{i:2,pick:0,ok:false,rt:3900}]},
+  g6:{status:'skipped',ms:3000}
+ },
+ audit:[
+  {t:'Sept 21, 3:12 PM',who:'Student',what:'Completed a Discovery session (6 games, 1 skipped)'},
+  {t:'Sept 21, 3:40 PM',who:'Parent',what:'Approved sharing with the school team and the Office of Business Opportunities'},
+  {t:'Sept 22, 9:05 AM',who:'Sherrita (OBO)',what:'Viewed the cohort dashboard'},
+  {t:'Sept 24, 8:30 AM',who:'Program Admin',what:'Set games per session to 6'}
+ ]
+};
+function seed(){
+  S.games=JSON.parse(JSON.stringify(SEED.games));
+  S.order=SEED.order.slice(); S.baseline=SEED.baseline; S.live=false;
+  S.session={active:false,finished:false}; S.preview=null;
+  S.consent={team:true,obo:true,employers:false,cohort:true};
+  S.profile=JSON.parse(JSON.stringify(SEED.profile)); S.profOff={}; S.profLogged=false; S.ready=JSON.parse(JSON.stringify(SEED_READY)); S.trkOff={}; S.readyLogged=false;
+  S.disabled={}; S.audit=JSON.parse(JSON.stringify(SEED.audit)); S.rawOpen=false; S.delArmed=false;
+  Object.assign(R,R0);
+}
+function logA(who,what){S.audit.unshift({t:nowStr(),who,what,live:true})}
+
+/* ================= scoring ================= */
+function thr(){
+  let lo=R.instantMs,hi=R.dwellMs;
+  if(R.useBaseline&&S.baseline){lo=Math.max(lo,Math.min(1200,S.baseline*0.2));hi=Math.max(hi,S.baseline*1.6)}
+  if(S.acc.hear)hi+=R.hearAllowMs; /* time spent listening is not lost interest */
+  return {lo,hi};
+}
+function cardPts(c){
+  const {lo,hi}=thr(); let p=0;
+  if(c.dwell>=hi)p=1; else if(c.dwell<lo&&c.act==='pass')p=-1;
+  if(c.act==='like')p=Math.max(p,0)+.5;
+  return clamp(p,-1,1.5);
+}
+const ptsToScore=p=>clamp(50+40*p,0,100);
+function contribs(){
+  const out=[];
+  for(const gid of S.order){
+    const g=GM[gid],r=S.games[gid]; if(!r)continue;
+    if(r.status==='skipped'){for(const c in g.serves)out.push({g:gid,cl:c,sc:R.skipScore,w:g.serves[c]*1.2,skip:true});continue}
+    if(g.type==='swipe'){
+      if(g.mixed){r.cards.forEach(c=>out.push({g:gid,cl:g.deck[c.i].c,sc:ptsToScore(cardPts(c)),w:.5}))}
+      else{const sc=ptsToScore(mean(r.cards.map(cardPts)));for(const c in g.serves)out.push({g:gid,cl:c,sc,w:g.serves[c]*2})}
+    }else if(g.type==='quiz'){
+      if(g.pref){r.rounds.forEach(x=>{const o=g.rounds[x.i].opts[x.pick];for(const c in o.pts)out.push({g:gid,cl:c,sc:o.pts[c],w:.7})})}
+      else{const sc=mean(r.rounds.map(x=>x.ok?100:0));for(const c in g.serves)out.push({g:gid,cl:c,sc,w:g.serves[c]*2})}
+    }else if(g.type==='seq'){
+      const tot=sum(r.rounds.map(x=>x.n)),ok=sum(r.rounds.map(x=>x.first));
+      const sc=tot?100*ok/tot:0;for(const c in g.serves)out.push({g:gid,cl:c,sc,w:g.serves[c]*2});
+    }
+  }
+  return out;
+}
+function band(s,n){
+  if(s==null)return 'none';
+  if(s>=R.strongMin&&n>=2)return 'strong';
+  if(s>=R.exploreMin)return 'explore';
+  return 'low';
+}
+function stats(){
+  const c=contribs(),o={};
+  CL.forEach(k=>o[k.id]={sw:0,sws:0,src:new Set()});
+  c.forEach(x=>{const e=o[x.cl];if(!e)return;e.sw+=x.w;e.sws+=x.w*x.sc;e.src.add(x.g)});
+  return CL.map(k=>{
+    const e=o[k.id],n=e.src.size,score=e.sw?Math.round(e.sws/e.sw):null;
+    return {id:k.id,score,n,conf:n>=3?'High':n===2?'Medium':n===1?'Low':'None',band:band(score,n)};
+  });
+}
+function ranked(){
+  return stats().sort((a,b)=>(b.score==null?-1:b.score)-(a.score==null?-1:a.score));
+}
+function riContribs(){
+  const out=[];
+  contribs().forEach(x=>{const m=CLRI[x.cl];for(const L in m)out.push({g:x.g,L,sc:x.sc,w:x.w*m[L]*.6})});
+  for(const gid of S.order){
+    const g=GM[gid],r=S.games[gid];
+    if(!r||r.status!=='played'||g.type!=='quiz'||!g.pref)continue;
+    r.rounds.forEach(x=>{const o=g.rounds[x.i].opts[x.pick];if(o.ri)for(const L in o.ri)out.push({g:gid,L,sc:o.ri[L],w:1.2})});
+  }
+  return out;
+}
+function riStats(){
+  const c=riContribs(),o={};RI.forEach(k=>o[k.id]={sw:0,sws:0,src:new Set()});
+  c.forEach(x=>{const e=o[x.L];e.sw+=x.w;e.sws+=x.w*x.sc;e.src.add(x.g)});
+  return RI.map(k=>{const e=o[k.id],n=e.src.size,score=e.sw?Math.round(e.sws/e.sw):null;
+    return {id:k.id,score,n,conf:n>=3?'High':n===2?'Medium':n===1?'Low':'None',band:band(score,n)}});
+}
+const riRanked=()=>riStats().sort((a,b)=>(b.score==null?-1:b.score)-(a.score==null?-1:a.score));
+const riTop=()=>riRanked().filter(s=>s.score!=null&&(s.band==='strong'||s.band==='explore')).slice(0,3);
+const riCodeStr=()=>riTop().map(s=>s.id).join(' · ')||'—';
+const accList=()=>{const a=[];if(S.acc.hear)a.push('read aloud'+(S.acc.rate==='slow'?' (slow)':''));if(S.acc.big)a.push('larger buttons');if(S.acc.extra)a.push('extra time');return a};
+function planOpts(){
+  const top=ranked().filter(s=>s.score!=null&&(s.band==='strong'||s.band==='explore')).slice(0,2).map(s=>CLM[s.id]);
+  const use=top.length?top:[CLM.retail,CLM.helping];
+  const uniq=a=>[...new Set(a)];
+  return {
+    y1:uniq([...use.map(k=>k.wbl[0]),'Play more games, then try one job shadow']),
+    y2:uniq([...use.map(k=>'Part-time job: '+k.careers[0]),...use.map(k=>k.wbl[2]),'Take a class that builds work skills']),
+    y3:uniq([...use.flatMap(k=>k.seu.slice(0,2)).filter(x=>!/confirm/i.test(x)),'Southeastern University transition certificate (ask about eligibility)','Community college or a training program','Start work with a job coach','Not sure yet'])
+  };
+}
+function profDone(){
+  const p=S.profile,ex=Object.keys(p.exp).filter(k=>p.exp[k].length);
+  const parts={str:p.str.length>=3,res:ex.length>=1&&!!p.name.trim(),plan:!!(p.plan.y1&&p.plan.y2&&p.plan.y3)};
+  const on=PROF_SECTIONS.filter(x=>!S.profOff[x.k]),n=on.filter(x=>parts[x.k]).length;
+  return {parts,n,total:on.length,pct:on.length?Math.round(100*n/on.length):0};
+}
+const hasData=()=>S.order.length>0;
+const topOne=()=>{const r=ranked()[0];return r&&r.score!=null?r:null};
+const played=()=>S.order.filter(g=>S.games[g]&&S.games[g].status==='played');
+const skipped=()=>S.order.filter(g=>S.games[g]&&S.games[g].status==='skipped');
+const totalMs=()=>sum(S.order.map(g=>(S.games[g]&&S.games[g].ms)||0));
+
+function gameSummary(gid){
+  const g=GM[gid],r=S.games[gid]; if(!r)return '';
+  if(r.status==='skipped')return 'Skipped';
+  const {hi}=thr();
+  if(g.type==='swipe'){
+    const holds=r.cards.filter(c=>c.dwell>=hi).length,likes=r.cards.filter(c=>c.act==='like').length;
+    const quick=r.cards.filter(c=>c.dwell<thr().lo&&c.act==='pass').length;
+    return `${holds} of ${r.cards.length} cards held ${(hi/1000).toFixed(1).replace('.0','')}+ seconds, ${likes} ♥, ${quick} quick pass${quick===1?'':'es'}`;
+  }
+  if(g.type==='quiz'){
+    if(g.pref)return 'Chose: '+r.rounds.map(x=>g.rounds[x.i].opts[x.pick].t).join(' · ');
+    return `${r.rounds.filter(x=>x.ok).length} of ${r.rounds.length} right`;
+  }
+  if(g.type==='seq')return `${sum(r.rounds.map(x=>x.first))} of ${sum(r.rounds.map(x=>x.n))} in order on the first try`;
+  return '';
+}
+function evidence(cl){
+  const gids=[...new Set(contribs().filter(x=>x.cl===cl).map(x=>x.g))];
+  const out=[];
+  gids.forEach(gid=>{
+    const g=GM[gid],r=S.games[gid];
+    if(r.status==='skipped'){out.push(`${g.name}: skipped`);return}
+    if(g.mixed){
+      r.cards.filter(c=>g.deck[c.i].c===cl).forEach(c=>out.push(`${g.name} (${g.deck[c.i].t}): stayed ${(c.dwell/1000).toFixed(1)} s${c.act==='like'?' and tapped ♥':''}`));
+    }else out.push(`${g.name}: ${gameSummary(gid)}`);
+  });
+  return out;
+}
+</script>
+<script>
+const RENDER={},AFTER={},HOOK={};
+/* ================= read aloud ================= */
+const EMO={'🍞':'bread','🧀':'cheese','🥬':'lettuce','🥩':'meat','🍅':'tomato'};
+const canSpeak=()=>{try{return 'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined'}catch(_){return false}};
+function speak(text){
+  try{
+    if(!canSpeak())return false;
+    window.speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(String(text));u.rate=S.acc.rate==='slow'?.72:.95;
+    window.speechSynthesis.speak(u);return true;
+  }catch(_){return false}
+}
+function stopSpeak(){try{if(canSpeak())window.speechSynthesis.cancel()}catch(_){}}
+function hearNow(text,btn){
+  if(!speak(text)&&btn){const o=btn.textContent;btn.textContent='🔇 Audio is not available here';setTimeout(()=>{btn.textContent=o},2600)}
+}
+const autoSay=t=>{if(S.acc.hear&&S.acc.auto)speak(t)};
+const hearBtn=t=>S.acc.hear?`<button class="hear" type="button" data-say="${esc(t)}">🔊 Hear it</button>`:'';
+
+/* ================= UI pieces ================= */
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const fitTag=b=>({strong:'<span class="tag green">Strong fit</span>',explore:'<span class="tag orange">Explore</span>',low:'<span class="tag plain">Not a fit yet</span>',none:'<span class="tag plain">Not explored</span>'}[b]);
+const stuTag=b=>({strong:'<span class="tag green">You loved this</span>',explore:'<span class="tag orange">You liked this</span>',low:'<span class="tag plain">Not for you yet</span>',none:'<span class="tag plain">Not tried yet</span>'}[b]);
+const emptyHtml=m=>`<div class="empty">${m}</div>`;
+const lockHtml=()=>`<div class="lock"><b>Results not shared</b>Maya's family has not shared Discovery results with the Office of Business Opportunities. The family can change this under Privacy &amp; Sharing in the parent view.</div>`;
+const toggleRow=(id,t,d,c)=>`<div class="toggle"><div class="tt"><b>${t}</b><span>${d}</span></div><label class="sw"><input type="checkbox" id="${id}" ${c?'checked':''} aria-label="${t}"><span class="trk"></span></label></div>`;
+
+function meter(st,aud){
+  const k=CLM[st.id],v=st.score,tag=aud==='student'?stuTag(st.band):fitTag(st.band);
+  const sub=v==null?'No games have covered this yet':aud==='student'?'':`${v} / 100 · ${st.conf} confidence · ${st.n} game${st.n===1?'':'s'}`;
+  return `<div class="meter"><div class="meter-top"><span class="mname">${k.ic} ${k.name}</span>${tag}</div><div class="bar" role="img" aria-label="${k.name}: ${v==null?'not explored':v+' out of 100'}"><i style="width:${v==null?0:v}%"></i></div>${sub?`<div class="small muted" style="margin-top:6px">${sub}</div>`:''}</div>`;
+}
+function riMeter(st,aud){
+  const k=RIM[st.id],v=st.score,name=aud==='student'?k.stu:k.name;
+  const tag=aud==='student'?stuTag(st.band):fitTag(st.band);
+  const sub=v==null?'No games have covered this yet':aud==='student'?k.d:`${v} / 100 · ${st.conf} confidence · ${st.n} game${st.n===1?'':'s'}. ${k.d}`;
+  return `<div class="meter"><div class="meter-top"><span class="mname">${k.ic} ${name}${aud==='student'?'':' <span class="small muted">('+k.id+')</span>'}</span>${tag}</div><div class="bar" role="img" aria-label="${name}: ${v==null?'not explored':v+' out of 100'}"><i style="width:${v==null?0:v}%"></i></div><div class="small muted" style="margin-top:6px">${sub}</div></div>`;
+}
+function riBlock(aud,title){
+  const top=riTop();
+  if(!hasData())return '';
+  const names=top.map(s=>aud==='student'?RIM[s.id].stu:RIM[s.id].name);
+  return `<div class="card mt"><h3>${title}</h3>${top.length?`<div class="code">${top.map(s=>`<span>${RIM[s.id].ic} ${aud==='student'?RIM[s.id].stu:RIM[s.id].id+' · '+RIM[s.id].name}</span>`).join('')}</div>`:emptyHtml('No interest style stood out yet.')}<p class="small muted" style="margin:0 0 6px">${RI_NOTE}</p>${riRanked().map(s=>riMeter(s,aud)).join('')}</div>`;
+}
+function evidenceFor(cl,aud){
+  if(aud!=='partner')return evidence(cl);
+  /* Sherrita's office sees summaries, not card-by-card timing */
+  const gids=[...new Set(contribs().filter(x=>x.cl===cl).map(x=>x.g))],out=[],{hi,lo}=thr();
+  gids.forEach(gid=>{
+    const g=GM[gid],r=S.games[gid];
+    if(r.status==='skipped'){out.push(`${g.name}: skipped`);return}
+    if(g.mixed){r.cards.filter(c=>g.deck[c.i].c===cl).forEach(c=>{const t=g.deck[c.i].t;out.push(`${g.name} (${t}): ${c.act==='like'||c.dwell>=hi?'showed interest':c.dwell<lo?'passed quickly':'no strong signal'}`)})}
+    else out.push(`${g.name}: ${gameSummary(gid)}`);
+  });
+  return out;
+}
+function pathCard(st,aud){
+  const k=CLM[st.id];
+  const L=aud==='student'?['Jobs you could try','Ways to try it','Study it at Southeastern University']:aud==='parent'?['Jobs to explore','Work-based learning','Study at Southeastern University']:['Placement categories','Work-based learning options','Post-secondary options (SEU)'];
+  const tag=aud==='student'?stuTag(st.band):fitTag(st.band);
+  const ev=evidenceFor(st.id,aud);
+  const why=aud==='student'?`<p class="why">${st.n} of your games pointed here.</p>`:`<p class="why"><b>${st.score} / 100 · ${st.conf} confidence.</b> ${ev.slice(0,3).join(' · ')}${ev.length>3?' · +'+(ev.length-3)+' more':''}</p>`;
+  const li=a=>a.map(x=>`<li>${x}</li>`).join('');
+  return `<div class="path"><div class="path-head"><h4>${k.ic} ${k.name}</h4>${tag}</div>${aud==='student'?`<div style="margin:0 0 8px">${hearBtn(k.name+'. Jobs you could try: '+k.careers.slice(0,3).join(', ')+'. Ways to try it: '+k.wbl.join(', ')+'. Study it at Southeastern University: '+k.seu.join(', ')+'.')}</div>`:''}${why}<div class="tri"><div><div class="lab">${L[0]}</div><ul>${li(k.careers.slice(0,aud==='student'?3:4))}</ul></div><div><div class="lab">${L[1]}</div><ul>${li(k.wbl)}</ul></div><div><div class="lab">${L[2]}</div><ul>${li(k.seu)}</ul></div></div></div>`;
+}
+function liveChip(){return S.session.active?`<span class="tag green">Playing now: game ${Math.min(S.order.length+1,S.session.n)} of ${S.session.n}</span>`:S.live?'<span class="tag green">Live session</span>':'<span class="tag plain">Session of Sept 21</span>'}
+function discoveryCard(){
+  if(!S.consent.obo)return lockHtml();
+  if(!hasData())return `<div class="card"><h3>Discovery game results</h3>${emptyHtml('No results yet. Switch to the student view and play, or reset the demo data.')}</div>`;
+  const r=ranked().filter(s=>s.score!=null),best=r.filter(s=>s.band==='strong'||s.band==='explore').slice(0,3);
+  return `<div class="card"><div class="row" style="justify-content:space-between"><h3 style="margin:0">Discovery game results</h3>${liveChip()}</div><p class="small muted" style="margin:8px 0 6px">${played().length} played · ${skipped().length} skipped · ${mmss(totalMs())} total. Points come from time on cards, answers, choices and skips. Confidence rises with the number of different games that back a cluster.</p><div class="insight gold" style="margin:6px 0 10px"><b>Interest code (RIASEC): ${riCodeStr()}.</b> ${riTop().map(s=>RIM[s.id].name).join(', ')||'Not enough points yet'}. <br><b>Supports in use:</b> ${accList().join(', ')||'none turned on'}.</div>${r.map(s=>meter(s,'partner')).join('')}<h4 style="margin:20px 0 10px;font-size:17px">Paths to explore first</h4>${best.map(s=>pathCard(s,'partner')).join('')||emptyHtml('No cluster has enough points yet.')}</div>`;
+}
+
+/* ================= game flow ================= */
+let ENG=null;
+function stopEngine(){if(ENG&&ENG.stop)ENG.stop();ENG=null;stopSpeak()}
+function nextGame(){
+  const done=new Set(S.order),avail=GAMES.filter(g=>!S.disabled[g.id]&&!done.has(g.id));
+  if(!avail.length)return null;
+  const open=['g2','g10'].map(id=>avail.find(g=>g.id===id)).find(Boolean);
+  if(open)return open;
+  const st=Object.fromEntries(stats().map(s=>[s.id,s]));
+  let best=null,bv=-1;
+  avail.forEach(g=>{let v=0;for(const c in g.serves){const s=st[c];v+=g.serves[c]*((s.score==null?60:s.score)+(s.n<2?15:0))}if(v>bv){bv=v;best=g}});
+  return best;
+}
+function reasonFor(g){
+  if(g.id==='g10')return 'A quick game about how you like to spend a day.';
+  if(S.order.length<2)return 'A quick warm-up to see what catches your eye.';
+  const st=Object.fromEntries(stats().map(s=>[s.id,s]));
+  const main=Object.keys(g.serves).sort((a,b)=>g.serves[b]-g.serves[a])[0],s=st[main];
+  if(s.score!=null&&s.score>=R.exploreMin+2)return `Because you liked ${CLM[main].short}, here is something close to it.`;
+  if(s.score==null||s.n<2)return 'Something new to try.';
+  return 'Let us try something different.';
+}
+function dotsHtml(){
+  const n=S.session.n;let h='';
+  for(let i=0;i<n;i++){const gid=S.order[i];h+=`<i class="${gid?(S.games[gid].status==='skipped'?'skip':'done'):i===S.order.length?'now':''}"></i>`}
+  return `<div class="dots" aria-label="Game ${Math.min(S.order.length+1,n)} of ${n}">${h}</div>`;
+}
+function beginRun(){
+  stopEngine();
+  S.games={};S.order=[];S.baseline=null;S.live=true;S.delArmed=false;
+  S.session={active:true,finished:false,n:Math.min(R.perSession,GAMES.filter(g=>!S.disabled[g.id]).length),phase:'between',last:null,cur:null,reason:''};
+  logA('Student','Started a new Discovery session; the earlier session was replaced');
+  pickNext();
+  setRole('student','s-play');
+}
+function pickNext(){
+  const ss=S.session,g=S.order.length>=ss.n?null:nextGame();
+  if(!g){endRun();return}
+  ss.cur=g.id;ss.reason=reasonFor(g);ss.phase='between';
+}
+function endRun(){
+  const ss=S.session;ss.active=false;ss.finished=true;ss.phase=null;
+  logA('Student',`Completed a Discovery session (${played().length} played, ${skipped().length} skipped)`);
+}
+function finishGame(gid,res){
+  const ss=S.session;S.games[gid]=res;S.order.push(gid);
+  ss.last=res.status==='played'?`Nice work on ${GM[gid].name}.`:`No problem. We skipped ${GM[gid].name}.`;
+  pickNext();updateDemoBar();playView();
+}
+function playView(){
+  const root=$('#playRoot');if(!root)return;
+  stopEngine();
+  if(S.preview){runPreview(root);return}
+  const ss=S.session;
+  if(!ss.active&&!ss.finished){
+    root.innerHTML=`<div class="stage"><div class="card between"><div class="big-e">🎯</div><h3>Career discovery games</h3><p>Play short games and see which jobs and classes match what you enjoy. It takes about ten minutes.</p><p class="small">Some games have right answers. Some are only about what you like. You can skip any game.</p><div class="hearrow" style="margin:0 0 6px">${hearBtn('Career discovery games. Play short games and see which jobs and classes match what you enjoy. It takes about ten minutes. Some games have right answers. Some are only about what you like. You can skip any game.')}</div><div class="row"><button class="btn big" type="button" data-act="start">${hasData()?'Play again':'Start'}</button>${hasData()?'<button class="btn secondary" type="button" data-goto="student:s-results">See my results</button>':''}</div></div></div>`;
+    return;
+  }
+  if(!ss.active&&ss.finished){
+    root.innerHTML=`<div class="stage"><div class="card between"><div class="big-e">🎉</div><h3>All done, Maya!</h3><p>You played ${played().length} game${played().length===1?'':'s'}${skipped().length?` and skipped ${skipped().length}. Skipping is okay`:''}. Your results are ready.</p><div class="row"><button class="btn big" type="button" data-goto="student:s-results">See my results</button></div></div></div>`;
+    return;
+  }
+  const g=GM[ss.cur];ss.phase='between';
+  root.innerHTML=`<div class="stage"><div class="stage-head"><div class="small muted">Game ${S.order.length+1} of ${ss.n}</div>${dotsHtml()}</div><div class="card between"><div class="big-e">${g.e}</div>${ss.last?`<div class="small" style="color:var(--green);font-weight:700;margin-top:8px">${ss.last}</div>`:''}<h3>${g.name}</h3><p>${g.blurb}</p><p class="small muted">${ss.reason}</p><div class="hearrow" style="margin:0 0 6px">${hearBtn(g.name+'. '+g.blurb)}</div><div class="row"><button class="btn big" id="goBtn" type="button">Let's play</button><button class="btn secondary" id="skipBtn" type="button">Skip this game</button></div></div></div>`;
+  autoSay(g.name+'. '+g.blurb);
+  $('#goBtn').onclick=()=>playGame(g.id);
+  $('#skipBtn').onclick=()=>finishGame(g.id,{status:'skipped',ms:0});
+}
+function playGame(gid){
+  const root=$('#playRoot'),g=GM[gid],ss=S.session;ss.phase='playing';
+  root.innerHTML=`<div class="stage"><div class="stage-head"><div><div class="small muted">Game ${S.order.length+1} of ${ss.n}</div><h3>${g.e} ${g.name}</h3></div>${dotsHtml()}</div><div id="gBody"></div><div class="center"><button class="link" id="skipNow" type="button">Skip this game</button></div></div>`;
+  const body=$('#gBody'),t0=performance.now();
+  ENG=makeEngine(g,body,res=>{res.ms=Math.round(performance.now()-t0);stopEngine();finishGame(gid,res)},{preview:false});
+  $('#skipNow').onclick=()=>{const ms=Math.round(performance.now()-t0);stopEngine();finishGame(gid,{status:'skipped',ms})};
+}
+function runPreview(root){
+  const g=GM[S.preview];
+  root.innerHTML=`<div class="stage"><div class="notice blue" style="margin-bottom:12px">Preview from the Admin view. Nothing you do here is saved.</div><div class="stage-head"><h3>${g.e} ${g.name}</h3><button class="link" id="pvBack" type="button">Back to Admin</button></div><div id="gBody"></div></div>`;
+  const back=()=>{stopEngine();S.preview=null;setRole('admin','a-games')};
+  $('#pvBack').onclick=back;
+  ENG=makeEngine(g,$('#gBody'),()=>{stopEngine();$('#gBody').innerHTML=`<div class="card between"><div class="big-e">✅</div><h3>Preview finished</h3><p>The game ran start to finish. No results were saved.</p><div class="row"><button class="btn" id="pvAgain" type="button">Run it again</button><button class="btn secondary" id="pvBack2" type="button">Back to Admin</button></div></div>`;$('#pvAgain').onclick=()=>runPreview(root);$('#pvBack2').onclick=back},{preview:true});
+}
+function makeEngine(g,body,done,opt){return g.type==='swipe'?swipeEngine(g,body,done,opt):g.type==='quiz'?quizEngine(g,body,done,opt):seqEngine(g,body,done,opt)}
+
+/* ---- swipe games: dwell time is the signal ---- */
+function swipeEngine(g,body,done,opt){
+  const cards=g.deck.map((c,i)=>({...c,i}));
+  const usePractice=!opt.preview&&S.baseline==null;
+  const seq=usePractice?[{practice:true,e:'👋',t:'Practice card',s:'Swipe or tap however you like. This one does not count.',g:['#4A5A8A','#1F2A52']},...cards]:cards;
+  const events=[];let k=0,t0=0,drag=null,dx=0,busy=false,dead=false;
+  body.innerHTML=`<div class="sw-wrap" id="swWrap"></div><div class="hearrow" id="swHearRow"></div><div class="sw-actions"><button class="sw-no" id="swNo" type="button" aria-label="Pass">✕</button><button class="sw-yes" id="swYes" type="button" aria-label="Like">♥</button></div><p class="small muted center">Swipe right or tap ♥ if you like it. Swipe left or tap ✕ to pass. Take your time.</p>`;
+  const wrap=$('#swWrap',body);
+  function draw(){
+    const c=seq[k];
+    wrap.innerHTML=`<div class="sw-card" id="swCard" style="background:linear-gradient(160deg,${c.g[0]},${c.g[1]})"><div class="sw-e">${c.e}</div><div class="sw-t">${c.t}</div><div class="sw-s">${c.s}</div></div>`;
+    const card=$('#swCard',wrap);
+    card.addEventListener('pointerdown',e=>{if(busy)return;drag={x:e.clientX};dx=0;try{card.setPointerCapture(e.pointerId)}catch(_){}card.style.transition='none'});
+    card.addEventListener('pointermove',e=>{if(!drag)return;dx=e.clientX-drag.x;card.style.transform=`translateX(${dx}px) rotate(${dx/18}deg)`});
+    const end=()=>{if(!drag)return;const d=dx;drag=null;dx=0;if(Math.abs(d)>90)act(d>0?'like':'pass');else{card.style.transition='transform .2s';card.style.transform=''}};
+    card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end);
+    const say=(k===0?'Swipe right or tap heart if you like it. Swipe left or tap X to pass. ':'')+c.t+'. '+c.s;
+    $('#swHearRow',body).innerHTML=hearBtn(say);autoSay(say);
+    t0=performance.now();
+  }
+  function act(a){
+    if(busy||dead)return;busy=true;
+    const dwell=performance.now()-t0,c=seq[k],card=$('#swCard',wrap);
+    if(c.practice)S.baseline=clamp(Math.round(dwell),400,6000);
+    else events.push({i:c.i,dwell:Math.round(dwell),act:a});
+    if(card){card.style.transition='transform .22s,opacity .22s';card.style.transform=`translateX(${a==='like'?440:-440}px) rotate(${a==='like'?20:-20}deg)`;card.style.opacity='0'}
+    setTimeout(()=>{if(dead)return;k++;busy=false;if(k>=seq.length)done({status:'played',cards:events});else draw()},230);
+  }
+  const key=e=>{if(e.key==='ArrowRight')act('like');else if(e.key==='ArrowLeft')act('pass')};
+  document.addEventListener('keydown',key);
+  $('#swYes',body).onclick=()=>act('like');$('#swNo',body).onclick=()=>act('pass');
+  draw();
+  return {stop(){dead=true;document.removeEventListener('keydown',key)}};
+}
+
+/* ---- quiz games: right answers or preference choices ---- */
+function quizEngine(g,body,done){
+  let i=0,dead=false;const out=[];
+  function show(){
+    const r=g.rounds[i],t0=performance.now();
+    body.innerHTML=`<div class="q-prompt"><div class="q-e">${r.e}</div><div class="q-t">${r.q}</div></div><div class="hearrow">${hearBtn(r.q+'. '+r.opts.map((o,j)=>'Choice '+(j+1)+': '+o.t).join('. '))}</div><div class="opts">${r.opts.map((o,j)=>`<button class="opt" type="button" data-j="${j}"><span class="oe">${o.e}</span><span>${o.t}</span></button>`).join('')}</div><div id="qfb"></div>`;
+    autoSay(r.q+'. '+r.opts.map((o,j)=>'Choice '+(j+1)+': '+o.t).join('. '));
+    $$('.opt',body).forEach(b=>b.onclick=()=>pick(+b.dataset.j,performance.now()-t0));
+  }
+  function pick(j,rt){
+    if(dead)return;
+    const r=g.rounds[i],o=r.opts[j],ok=!g.pref&&!!o.ok;
+    out.push({i,pick:j,ok,rt:Math.round(rt)});
+    const btns=$$('.opt',body);btns.forEach(b=>b.disabled=true);
+    let msg='',cls='';
+    if(g.pref){btns[j].classList.add('picked');msg='Got it.'}
+    else if(ok){btns[j].classList.add('good');msg='Yes. That is right.';cls='good'}
+    else{const c=r.opts.findIndex(x=>x.ok);btns[j].classList.add('soft');btns[c].classList.add('good');msg=`Good try. The best answer was: ${r.opts[c].t}`;cls='soft'}
+    autoSay(msg);
+    const last=i>=g.rounds.length-1;
+    $('#qfb',body).innerHTML=`<div class="fb ${cls}">${msg}</div><div class="center mt"><button class="btn" id="qNext" type="button">${last?'Finish':'Next'}</button></div>`;
+    $('#qNext',body).onclick=()=>{if(dead)return;if(last)done({status:'played',rounds:out});else{i++;show()}};
+  }
+  show();
+  return {stop(){dead=true}};
+}
+
+/* ---- sequence game: watch, then tap in order ---- */
+function seqEngine(g,body,done){
+  let ri=0,dead=false;const timers=[],out=[];
+  const T=(f,ms)=>{timers.push(setTimeout(()=>{if(!dead)f()},ms))};
+  const clear=()=>{timers.forEach(clearTimeout);timers.length=0};
+  const step=Math.max(S.acc.extra?1500:800,S.acc.hear?1400:0),hold=S.acc.extra?2200:1200;
+  function round(){
+    const r=g.rounds[ri],items=r.items,n=items.length,pooled=shuffle(items);
+    let pos=0,again=0;const missed=new Set();
+    body.innerHTML=`<div class="q-prompt"><div class="q-t">${r.q}</div><div class="small muted" id="sqHint" style="margin-top:6px"></div></div><div class="hearrow">${hearBtn(r.q+'. Watch the order, then tap the food in the same order. Each food will be named out loud as it appears.')}</div><div class="seq-row" id="sqRow"></div><div class="seq-row" id="sqPool"></div><div class="center"><button class="link" id="sqAgain" type="button">Show me again</button></div>`;
+    const row=$('#sqRow',body),pool=$('#sqPool',body),hint=$('#sqHint',body);
+    const slots=(mode,upTo)=>{row.innerHTML=items.map((it,i)=>mode==='watch'?(i<upTo?`<div class="seq-item">${it}</div>`:'<div class="seq-item slot">·</div>'):(i<pos?`<div class="seq-item ok">${it}</div>`:'<div class="seq-item slot">?</div>')).join('')};
+    const drawPool=()=>{
+      pool.innerHTML=pooled.map(it=>`<button class="seq-item" type="button" data-it="${it}" aria-label="${EMO[it]||it}">${it}</button>`).join('');
+      $$('button',pool).forEach(b=>{if(items.indexOf(b.dataset.it)<pos){b.disabled=true;b.style.opacity='.35'}b.onclick=()=>tap(b)});
+    };
+    function tap(b){
+      if(dead)return;
+      if(b.dataset.it===items[pos]){
+        pos++;b.disabled=true;b.style.opacity='.35';slots('play');if(S.acc.hear&&pos<n)speak(EMO[b.dataset.it]||'');
+        if(pos>=n){hint.textContent='You got it.';out.push({n,first:n-missed.size,again});T(()=>{ri++;if(ri>=g.rounds.length)done({status:'played',rounds:out});else round()},900)}
+      }else{
+        missed.add(pos);b.classList.remove('shake');void b.offsetWidth;b.classList.add('shake');
+        hint.textContent='Almost. Try another one, or tap Show me again.';
+      }
+    }
+    function watch(){
+      pool.innerHTML='';hint.textContent='Watch the order.';slots('watch',0);
+      for(let i=1;i<=n;i++)T(()=>{slots('watch',i);if(S.acc.hear)speak(EMO[items[i-1]]||'')},step*i);
+      T(()=>{slots('play');hint.textContent='Your turn. Tap them in the same order.';drawPool()},step*n+hold);
+    }
+    $('#sqAgain',body).onclick=()=>{again++;clear();watch()};
+    watch();
+  }
+  round();
+  return {stop(){dead=true;clear()}};
+}
+</script>
+<script>
+/* ================= Career Profile ================= */
+const strList=()=>S.profile.str.map(id=>STR_M[id]).filter(Boolean);
+const expKeys=()=>Object.keys(S.profile.exp).filter(k=>EXPM[k]&&S.profile.exp[k].length);
+const doneText=d=>`${d.n} of ${d.total} parts done`;
+const hearDyn=(id,label)=>S.acc.hear?`<button class="hear" type="button" id="${id}">🔊 ${label}</button>`:'';
+function resumeHtml(){
+  const p=S.profile;
+  const ints=ranked().filter(s=>s.score!=null&&(s.band==='strong'||s.band==='explore')).slice(0,3).map(s=>CLM[s.id].short);
+  const ex=expKeys();
+  return `<div class="resume"><h4>${esc(p.name)||'Your name'}</h4><div class="rs">${esc(p.school)||'Your school'}</div>`+
+   (S.profOff.str?'':`<h5>Strengths</h5>${strList().length?`<div>${strList().map(x=>esc(x.t)).join(' · ')}</div>`:'<div class="rs">Pick your strengths first.</div>'}`)+
+   `<h5>Experience</h5>${ex.length?ex.map(k=>`<div style="margin-top:6px"><b>${EXPM[k].t}</b><ul>${S.profile.exp[k].map(i=>`<li>${EXPM[k].tasks[i]}</li>`).join('')}</ul></div>`).join(''):'<div class="rs">Add something you have done.</div>'}`+
+   (ints.length?`<h5>Interested in</h5><div>${ints.map(esc).join(' · ')}</div>`:'')+`</div>`;
+}
+const planRowsHtml=()=>PLAN_SLOTS.map(s=>`<div class="planrow"><div class="pl">${s.l}</div><div>${S.profile.plan[s.k]?esc(S.profile.plan[s.k]):'<span class="muted">Not chosen yet</span>'}</div></div>`).join('');
+function profSpeech(){
+  const p=S.profile,t=['My career profile.'];
+  if(!S.profOff.str)t.push(strList().length?'My strengths: '+strList().map(x=>x.t).join(', ')+'.':'I have not picked strengths yet.');
+  if(!S.profOff.res){const ex=expKeys();t.push(ex.length?'My experience: '+ex.map(k=>EXPM[k].t+': '+p.exp[k].map(i=>EXPM[k].tasks[i]).join(', ')).join('. ')+'.':'I have not added experience yet.')}
+  if(!S.profOff.plan)t.push(PLAN_SLOTS.map(s=>s.l+': '+(p.plan[s.k]||'not chosen yet')).join('. ')+'.');
+  return t.join(' ');
+}
+function profileView(){
+  const d=profDone(),p=S.profile,blank=!d.n&&!p.name.trim()&&!p.str.length;
+  if(blank)return `<div class="card">${emptyHtml('The Career Profile has not been started yet. Maya builds it in the student view, or reset the demo data.')}</div>`;
+  const tiles=`<div class="tiles"><div class="tile"><div class="k">Profile complete</div><div class="v">${d.pct}%</div><div class="small muted">${doneText(d)}</div></div><div class="tile"><div class="k">Strengths picked</div><div class="v">${p.str.length}</div></div><div class="tile"><div class="k">Experiences added</div><div class="v">${expKeys().length}</div></div><div class="tile"><div class="k">Interest code</div><div class="v" style="font-size:22px">${riCodeStr()}</div></div></div>`;
+  const str=S.profOff.str?'':`<div class="card"><h3>Strengths</h3>${strList().length?`<div class="chips">${strList().map(x=>`<span class="chip" aria-pressed="true">${x.e} ${esc(x.t)}</span>`).join('')}</div>`:emptyHtml('None picked yet.')}</div>`;
+  const plan=S.profOff.plan?'':`<div class="card"><h3>Future plan</h3>${planRowsHtml()}</div>`;
+  const two=(str||plan)?`<div class="grid g2 mt">${str}${plan}</div>`:'';
+  return tiles+two+(S.profOff.res?'':`<div class="card mt"><h3>Resume</h3>${resumeHtml()}</div>`);
+}
+
+/* ---- student ---- */
+RENDER['s-profile']=()=>{
+  const d=profDone(),p=S.profile;
+  const sug=[...new Set(riTop().flatMap(s=>STR_SUG[s.id]||[]))];
+  const opts=planOpts();
+  const hero=`<div class="card hero"><div class="kicker">My Career Profile</div><h3 style="margin:6px 0 8px">Build your profile, Maya.</h3><p class="muted" style="font-size:15px;line-height:1.6;max-width:60ch;margin:0 0 12px">Pick your strengths, add what you have done, and choose your next steps. Your games give you ideas. You can change anything, any time. Your family decides who else sees it.</p><div class="bar" role="img" aria-label="Profile ${d.pct} percent done"><i id="profBar" style="width:${d.pct}%"></i></div><div class="small" id="profDone" style="margin-top:6px">${doneText(d)}</div><div class="hearrow" style="justify-content:flex-start">${hearDyn('profHearAll','Hear my profile')}</div></div>`;
+  const s1=S.profOff.str?'':`<div class="card mt"><h3>1 · My strengths</h3><p class="small muted" style="margin-top:-6px">Pick three to six that sound like you. ${sug.length?'Dashed ones are ideas from your games.':''}</p><div class="chips" id="strChips">${STR.map(x=>`<button type="button" class="chip${sug.includes(x.id)?' sug':''}" data-str="${x.id}" aria-pressed="${p.str.includes(x.id)}">${x.e} ${x.t}</button>`).join('')}</div>${sug.length?'<div class="row" style="margin-top:12px"><button class="btn secondary sm" type="button" id="strSug">Add the ideas from my games</button></div>':''}<div class="hearrow" style="justify-content:flex-start">${hearBtn('My strengths. Pick three to six that sound like you. The choices are: '+STR.map(x=>x.t).join(', ')+'.')}</div></div>`;
+  const s2=S.profOff.res?'':`<div class="card mt"><h3>2 · My resume</h3><p class="small muted" style="margin-top:-6px">Open a job or activity and tick what you did. Your resume builds itself below.</p>
+<div class="field"><label for="profName">My name</label><input type="text" id="profName" value="${esc(p.name)}" autocomplete="off"></div>
+<div class="field"><label for="profSchool">My school</label><input type="text" id="profSchool" value="${esc(p.school)}" autocomplete="off"></div>
+${EXPS.map(x=>`<details class="expcard" ${(p.exp[x.id]||[]).length?'open':''}><summary><b>${x.e} ${x.t}</b></summary>${x.tasks.map((t,i)=>`<label><input type="checkbox" data-exp="${x.id}" data-i="${i}" ${(p.exp[x.id]||[]).includes(i)?'checked':''}> ${t}</label>`).join('')}</details>`).join('')}
+<h4 style="margin:18px 0 10px;font-size:16px">My resume so far</h4><div id="resPrev">${resumeHtml()}</div></div>`;
+  const s3=S.profOff.plan?'':`<div class="card mt"><h3>3 · My future plan</h3><p class="small muted" style="margin-top:-6px">The choices come from the areas your games pointed to. Pick what sounds best. You can change it later.</p>${PLAN_SLOTS.map(s=>{const list=opts[s.k].slice();if(p.plan[s.k]&&!list.includes(p.plan[s.k]))list.unshift(p.plan[s.k]);return `<div class="field"><label for="plan_${s.k}">${s.l}: ${s.q}</label><select id="plan_${s.k}"><option value="">Choose one</option>${list.map(o=>`<option value="${esc(o)}" ${p.plan[s.k]===o?'selected':''}>${esc(o)}</option>`).join('')}</select></div>`}).join('')}<p class="small muted" style="margin:0">Southeastern University lists change. Confirm programs with the school team before you count on one.</p></div>`;
+  return hero+(s1||s2||s3?s1+s2+s3:`<div class="card mt">${emptyHtml('Your school team has not turned on any Career Profile parts yet.')}</div>`);
+};
+AFTER['s-profile']=()=>{
+  const touch=()=>{if(!S.profLogged){S.profLogged=true;logA('Student','Started building the Career Profile');updateDemoBar()}};
+  const upd=()=>{const d=profDone();$('#profBar').style.width=d.pct+'%';$('#profDone').textContent=doneText(d);const r=$('#resPrev');if(r)r.innerHTML=resumeHtml()};
+  $$('[data-str]').forEach(b=>b.onclick=()=>{touch();const id=b.dataset.str,a=S.profile.str,i=a.indexOf(id);if(i>=0)a.splice(i,1);else a.push(id);b.setAttribute('aria-pressed',a.includes(id));upd()});
+  const sg=$('#strSug');if(sg)sg.onclick=()=>{touch();[...new Set(riTop().flatMap(s=>STR_SUG[s.id]||[]))].forEach(id=>{if(!S.profile.str.includes(id))S.profile.str.push(id)});$$('[data-str]').forEach(b=>b.setAttribute('aria-pressed',S.profile.str.includes(b.dataset.str)));upd()};
+  const nm=$('#profName');if(nm){nm.oninput=()=>{touch();S.profile.name=nm.value;upd()};$('#profSchool').oninput=e=>{touch();S.profile.school=e.target.value;upd()}}
+  $$('[data-exp]').forEach(c=>c.onchange=()=>{touch();const k=c.dataset.exp,i=+c.dataset.i,a=S.profile.exp[k]||(S.profile.exp[k]=[]);if(c.checked){if(!a.includes(i))a.push(i);a.sort((x,y)=>x-y)}else{a.splice(a.indexOf(i),1);if(!a.length)delete S.profile.exp[k]}upd()});
+  PLAN_SLOTS.forEach(s=>{const el=$('#plan_'+s.k);if(el)el.onchange=()=>{touch();S.profile.plan[s.k]=el.value;upd();if(S.acc.hear&&el.value)speak(el.value)}});
+  const h=$('#profHearAll');if(h)h.onclick=()=>hearNow(profSpeech(),h);
+};
+
+/* ---- parent ---- */
+RENDER['p-profile']=()=>`<div class="notice blue">Maya builds this herself, from her games and her own choices. You can see it here. Her resume goes to an employer only if you turn on employer sharing.</div>
+<div class="mt">${profileView()}</div>
+<div class="grid g2 mt"><div class="card"><h3>Ways to help</h3><ul style="font-size:14px;line-height:1.8;padding-left:18px;margin:0;color:var(--text-dim)"><li>Ask Maya to read her plan out loud, or use the 🔊 button in her view.</li><li>Add a job or activity she forgot, like helping at home.</li><li>Bring the profile to the next transition meeting.</li></ul></div>
+<div class="card"><h3>Who can see it</h3><p style="font-size:14px;line-height:1.65;margin:0;color:var(--text-dim)">Shared with: ${sharedList()}. Employers see the resume only after you approve them one by one. Employer sharing is currently <b>${S.consent.employers?'on':'off'}</b>.</p></div></div>`;
+
+/* ---- Sherrita ---- */
+RENDER['o-profile']=()=>{
+  if(!S.consent.obo)return lockHtml();
+  return `<div class="notice blue">Maya built this herself. It is shared here because her family approved sharing with this office.</div><div class="mt">${profileView()}</div>
+<div class="grid g2 mt"><div class="card"><h3>How the office can use it</h3><ul style="font-size:14px;line-height:1.8;padding-left:18px;margin:0;color:var(--text-dim)"><li>Line up the plan with real job shadows and work-based learning.</li><li>Use the strengths and interest code when talking with an employer, once the family approves.</li><li>Check the supports Maya uses: ${accList().join(', ')||'none turned on'}.</li></ul></div>
+<div class="card"><h3>Resume and employers</h3><p style="font-size:14px;line-height:1.65;margin:0;color:var(--text-dim)">Resume shared with employers: <b>${S.consent.employers?'Yes, approved employers only':'No'}</b>. The family approves each employer.</p></div></div>`;
+};
+AFTER['o-profile']=()=>{if(S.consent.obo&&!(S.audit[0]&&S.audit[0].what==='Viewed the Career Profile'))logA('Sherrita (OBO)','Viewed the Career Profile')};
+
+</script>
+<script>
+/* ================= Readiness tracking ================= */
+const READY_STAGE={cover:['Not started','Working on it','Done'],li:['Not started','Started','Live'],wbl:['No step yet','Interested','Scheduled','Completed'],post:['No step yet','Exploring','Info requested','Applied']};
+const SOCIAL_TIPS=['My accounts are private, or I have chosen what is public','My profile photo is one I would show an employer','My posts and comments are ones I would be fine with an employer reading','My username and bio are respectful','I know how to check who can see my accounts','I know who to ask if I want help removing something'];
+const TRC_SESS=['Resume Foundations webinar','Cover Letters & LinkedIn','Interview Practice','Workplace Skills'];
+const blankReady=()=>({cover:0,li:0,social:[false,false,false,false,false,false],trc:[false,false,false,false],cvRev:false,wbl:0,post:0});
+const SEED_READY={cover:1,li:0,social:[true,true,false,false,false,false],trc:[true,false,false,false],cvRev:false,wbl:1,post:0};
+const TRK=[
+ {id:'games',t:'Career games finished',src:'auto',scored:true,how:'The platform records games played and skipped, and the interest code.',who:'Automatic',see:'Family. Office sees summaries. Admin sees counts.'},
+ {id:'res',t:'Resume built',src:'auto',scored:true,how:'Counts as done when the student has a name and at least one experience in the Career Profile.',who:'Student, in the Career Profile',see:'Family. Office with family approval.'},
+ {id:'plan',t:'Future plan chosen',src:'auto',scored:true,how:'Counts as done when all three plan steps are chosen in the Career Profile.',who:'Student, in the Career Profile',see:'Family. Office with family approval.'},
+ {id:'cover',t:'Cover letter',src:'student',scored:true,how:'Student marks not started, working on it or done. A TRC coach can mark it reviewed.',who:'Student, TRC coach',see:'Family. Office with family approval.'},
+ {id:'li',t:'LinkedIn profile',src:'student',scored:true,how:'Student marks not started, started or live. ORBIT stores the status only, never a login or the profile itself.',who:'Student',see:'Family. Office with family approval.'},
+ {id:'social',t:'Social media self-check',src:'student',scored:true,how:'Student answers six prompts about their own accounts, ideally with a TRC coach. ORBIT stores only how many are checked. No handles, posts or photos are stored or seen, and no account is monitored.',who:'Student, with a TRC coach',see:'Family. Office sees done or not yet only.'},
+ {id:'trc',t:'TRC training sessions',src:'trc',scored:true,how:'TRC records attendance at each of four sessions.',who:'TRC',see:'Family. Office with family approval.'},
+ {id:'wbl',t:'Work-based learning step',src:'office',scored:false,how:'Office or school records interested, scheduled or completed for a job shadow or internship.',who:'Office or school team',see:'Family. Office. Admin sees counts.'},
+ {id:'post',t:'Postsecondary step',src:'office',scored:false,how:'Office or school records exploring, info requested or applied, for example SEU Link or a training program.',who:'Office or school team',see:'Family. Office. Admin sees counts.'}
+];
+const TRKM=Object.fromEntries(TRK.map(t=>[t.id,t]));
+const SRC_TAG={auto:['blue','Automatic'],student:['plain','Student'],trc:['gold','TRC'],office:['purple','Office']};
+const srcTag=s=>`<span class="tag ${SRC_TAG[s][0]}">${SRC_TAG[s][1]}</span>`;
+const trkOn=id=>!S.trkOff[id];
+const RDY_OTHERS={n:41,cnt:{games:30,res:22,plan:18,cover:19,li:14,social:21,trc:30,wbl:8,post:6},sess:[30,22,15,9],avg:58,bands:{ready:11,build:19,start:11},share:38};
+const RDY_ROWS=[
+ {n:'Student A',v:{games:1,res:1,plan:1,cover:1,li:1,social:1,trc:1,wbl:1,post:.67},t:{social:'6 of 6',trc:'4 of 4',cover:'Done',li:'Live'}},
+ {n:'Student B',v:{games:1,res:1,plan:1,cover:1,li:.5,social:.67,trc:.75,wbl:.67,post:.33},t:{social:'4 of 6',trc:'3 of 4',cover:'Done',li:'Started'}},
+ {n:'Student C',v:{games:1,res:1,plan:0,cover:.5,li:0,social:.33,trc:.5,wbl:.33,post:0},t:{social:'2 of 6',trc:'2 of 4',cover:'Working',li:'Not yet'}},
+ {n:'Student D',v:{games:1,res:0,plan:0,cover:0,li:0,social:0,trc:.25,wbl:0,post:0},t:{social:'0 of 6',trc:'1 of 4',cover:'Not yet',li:'Not yet'}},
+ {n:'Student E',v:{games:.5,res:0,plan:0,cover:0,li:0,social:.17,trc:0,wbl:0,post:0},t:{social:'1 of 6',trc:'0 of 4',cover:'Not yet',li:'Not yet'}}];
+function mayaVals(){
+  const r=S.ready,d=profDone(),ex=Object.keys(S.profile.exp).filter(k=>S.profile.exp[k].length);
+  return {games:(hasData()&&!S.session.active)?1:0,res:(ex.length>=1&&!!S.profile.name.trim())?1:0,plan:d.parts.plan?1:0,cover:r.cover/2,li:r.li/2,social:r.social.filter(Boolean).length/6,trc:r.trc.filter(Boolean).length/4,wbl:r.wbl/3,post:r.post/3};
+}
+function rdScore(v){
+  const ids=TRK.filter(t=>t.scored&&trkOn(t.id)).map(t=>t.id);
+  return ids.length?Math.round(100*ids.reduce((a,k)=>a+(v[k]||0),0)/ids.length):0;
+}
+const rdBand=p=>p>=75?['green','Ready to match']:p>=40?['gold','Building']:['plain','Getting started'];
+const rdTag=p=>{const b=rdBand(p);return `<span class="tag ${b[0]}">${b[1]}</span>`};
+const stTag=(v,txt)=>v>=1?`<span class="tag green">${txt}</span>`:v>0?`<span class="tag gold">${txt}</span>`:`<span class="tag plain">${txt}</span>`;
+function mayaText(){
+  const r=S.ready,v=mayaVals();
+  return {
+   games:S.session.active?'Playing now':hasData()?`${played().length} played, ${skipped().length} skipped`:'Not started',
+   res:v.res?'Built':'Not yet',plan:v.plan?'Chosen':'Not yet',
+   cover:READY_STAGE.cover[r.cover]+(r.cvRev?' · TRC reviewed':''),li:READY_STAGE.li[r.li],
+   social:`${r.social.filter(Boolean).length} of 6 checked`,trc:`${r.trc.filter(Boolean).length} of 4 attended`,
+   wbl:READY_STAGE.wbl[r.wbl],post:READY_STAGE.post[r.post]};
+}
+function rdCounts(){
+  const r=S.ready,v=mayaVals(),c={...RDY_OTHERS.cnt},sess=RDY_OTHERS.sess.slice(),bands={...RDY_OTHERS.bands};
+  let n=RDY_OTHERS.n,tot=RDY_OTHERS.avg*RDY_OTHERS.n,incl=false;
+  if(S.consent.cohort&&(hasData()||true)){
+    incl=true;n++;
+    if(v.games===1)c.games++;if(v.res===1)c.res++;if(v.plan===1)c.plan++;if(r.cover===2)c.cover++;if(r.li===2)c.li++;
+    if(r.social.every(Boolean))c.social++;if(r.trc.some(Boolean))c.trc++;if(r.wbl>=2)c.wbl++;if(r.post>=1)c.post++;
+    r.trc.forEach((x,i)=>{if(x)sess[i]++});
+    const p=rdScore(v);tot+=p;const b=rdBand(p)[1];bands[b==='Ready to match'?'ready':b==='Building'?'build':'start']++;
+  }
+  return {n,c,sess,bands,avg:Math.round(tot/n),incl};
+}
+const rdBar=(v,n)=>`<div class="ln"><div class="trk"><i style="width:${n?v/n*100:0}%;background:var(--series-a)"></i></div><span class="num" style="min-width:74px">${v} of ${n}</span></div>`;
+const FUN_LABEL={games:'Finished the career games',res:'Resume built',plan:'Future plan chosen',cover:'Cover letter done',li:'LinkedIn profile live',social:'Social media self-check complete',trc:'Attended at least one TRC session',wbl:'Work-based learning step scheduled or done',post:'Started a postsecondary step'};
+function trackTable(admin){
+  return `<div class="tablewrap"><table><thead><tr><th>What is tracked</th><th>Where it comes from</th><th>Who enters it</th><th>Who sees it</th>${admin?'<th>On</th>':''}</tr></thead><tbody>${TRK.map(t=>`<tr><td><b>${t.t}</b><div style="margin-top:4px">${srcTag(t.src)}</div></td><td>${t.how}</td><td>${t.who}</td><td>${t.see}</td>${admin?`<td><label class="sw"><input type="checkbox" class="ktog" data-k="${t.id}" ${trkOn(t.id)?'checked':''} aria-label="Track ${t.t}"><span class="trk"></span></label></td>`:''}</tr>`).join('')}</tbody></table></div>`;
+}
+function readyDash(admin){
+  const k=rdCounts(),v=mayaVals(),ids=TRK.filter(t=>trkOn(t.id));
+  const fun=ids.filter(t=>t.id!=='trc').map(t=>`<div class="hb"><div class="nm">${FUN_LABEL[t.id]}<div class="small muted" style="font-weight:400">${SRC_TAG[t.src][1]}</div></div><div class="bars">${rdBar(k.c[t.id],k.n)}</div></div>`);
+  const trcRows=trkOn('trc')?TRC_SESS.map((s,i)=>`<div class="hb"><div class="nm">${s}</div><div class="bars">${rdBar(k.sess[i],k.n)}</div></div>`).join(''):'';
+  const gaps=ids.filter(t=>t.id!=='trc'&&t.id!=='post'&&t.id!=='wbl').map(t=>({t,p:k.c[t.id]/k.n})).sort((a,b)=>a.p-b.p).slice(0,2);
+  const none=k.n-k.c.trc;
+  const tiles=`<div class="tiles"><div class="tile"><div class="k">Students in view</div><div class="v">${k.n}</div></div><div class="tile"><div class="k">Average readiness</div><div class="v">${k.avg}%</div></div><div class="tile"><div class="k">Ready to match</div><div class="v">${k.bands.ready}</div></div><div class="tile"><div class="k">Getting started</div><div class="v">${k.bands.start}</div></div></div>`;
+  const insights=`<div class="insight gold"><b>Biggest gaps.</b> ${gaps.map(g=>`${FUN_LABEL[g.t.id]}: ${k.c[g.t.id]} of ${k.n}`).join('; ')}. These are the steps TRC sessions can move fastest.</div>${trkOn('trc')?`<div class="insight"><b>${none} of ${k.n} students have not been to a TRC session yet.</b> They are the natural first invitations for the next Resume Foundations webinar.</div>`:''}<div class="insight"><b>${k.bands.ready} students are ready to match.</b> They have most of the steps done and can be lined up with work-based learning and partner conversations, with family approval.</div>`;
+  let tbl='';
+  if(!admin){
+    const cols=[['games','Games'],['res','Resume'],['cover','Cover letter'],['li','LinkedIn'],['social','Social check'],['trc','TRC sessions'],['wbl','Work-based step']].filter(c=>trkOn(c[0]));
+    let mayaRow;
+    if(!S.consent.obo)mayaRow=`<tr><td><b>Maya R.</b></td><td colspan="${cols.length+1}"><span class="tag orange">Not shared</span> <span class="small muted">Her family has not shared with this office.</span></td></tr>`;
+    else{const t=mayaText(),p=rdScore(v);mayaRow=`<tr><td><b>Maya R.</b> ${S.live?'<span class="tag green">Live</span>':''}</td><td>${p}% ${rdTag(p)}</td>${cols.map(c=>`<td>${stTag(v[c[0]],c[0]==='games'?(v.games?'Done':S.session.active?'Playing':'Not yet'):c[0]==='res'?(v.res?'Done':'Not yet'):c[0]==='cover'?READY_STAGE.cover[S.ready.cover]:c[0]==='li'?READY_STAGE.li[S.ready.li]:c[0]==='social'?(S.ready.social.every(Boolean)?'Complete':'Not yet'):c[0]==='trc'?t.trc.replace(' attended',''):READY_STAGE.wbl[S.ready.wbl])}</td>`).join('')}<td>${p}% ${rdTag(p)}</td></tr>`}
+    const others=RDY_ROWS.map(r=>{const p=rdScore(r.v);return `<tr><td>${r.n}</td><td>${p}% ${rdTag(p)}</td>${cols.map(c=>{const id=c[0],x=r.v[id];const txt=id==='games'?(x>=1?'Done':x>0?'Partly':'Not yet'):id==='res'?(x?'Done':'Not yet'):id==='cover'?r.t.cover:id==='li'?r.t.li:id==='social'?(x>=1?'Complete':'Not yet'):id==='trc'?r.t.trc:(x>=.67?'Scheduled':x>0?'Interested':'No step');return `<td>${stTag(x,txt)}</td>`}).join('')}</tr>`}).join('');
+    tbl=`<div class="card mt"><h3>Students</h3><p class="small muted" style="margin-top:-6px">A sample of five students plus Maya. Social media shows only complete or not yet.</p><div class="tablewrap"><table><thead><tr><th>Student</th><th>Readiness</th>${cols.map(c=>`<th>${c[1]}</th>`).join('')}</tr></thead><tbody>${mayaRow}${others}</tbody></table></div></div>`;
+  }
+  const scoreNote=`<p class="small muted" style="margin:12px 0 0">Readiness is the share of the tracked steps a student has done: ${TRK.filter(t=>t.scored&&trkOn(t.id)).map(t=>t.t.toLowerCase()).join(', ')}. Work-based learning and postsecondary steps show where a student is headed and are not part of the score. A lower score means steps are still open. It says nothing about ability.</p>`;
+  return `<div class="notice blue">Illustrative cohort. Maya R. is the one live student, counted here ${k.incl?'because her family allows cohort statistics':'only if her family allows cohort statistics (currently off)'}.</div><div class="mt">${tiles}</div>
+<div class="card mt"><h3>Readiness steps across the cohort</h3><p class="small muted" style="margin-top:-6px">How many students have finished each step. Total counted: ${k.n}.</p>${fun.join('')}${scoreNote}</div>
+${trkOn('trc')?`<div class="card mt"><h3>TRC training attendance</h3><p class="small muted" style="margin-top:-6px">Students who have attended each session so far.</p>${trcRows}</div>`:''}
+<div class="card mt"><h3>What this suggests</h3>${insights}</div>${tbl}`;
+}
+const socialNote='The social media check is a self-check. ORBIT does not connect to, watch or store anyone’s accounts. The office sees only whether it is complete, never handles, posts or photos.';
+
+/* ---- student ---- */
+function readySpeech(){
+  const t=mayaText(),r=S.ready,v=mayaVals();
+  return `My readiness checklist. ${rdScore(v)} percent done. Games: ${t.games}. Resume: ${t.res}. Future plan: ${t.plan}. Cover letter: ${t.cover}. LinkedIn: ${t.li}. Social media check: ${t.social}. Training sessions: ${t.trc}.`;
+}
+const keep=(id,fn)=>{fn();refresh();const e=document.getElementById(id);if(e)e.focus()};
+function touchReady(){if(!S.readyLogged){S.readyLogged=true;logA('Student','Updated the readiness checklist');updateDemoBar()}}
+RENDER['s-ready']=()=>{
+  const v=mayaVals(),r=S.ready,sc=rdScore(v),t=mayaText(),on=trkOn;
+  const hero=`<div class="card hero"><div class="kicker">My Readiness</div><h3 style="margin:6px 0 8px">Your job-ready checklist, Maya.</h3><p class="muted" style="font-size:15px;line-height:1.6;max-width:60ch;margin:0 0 12px">These steps get you ready for a job, an internship or the next school. Some fill in by themselves from your games and Career Profile. You mark the rest. Your TRC coach marks the training sessions you attend. Your family decides who else sees this.</p><div class="bar" role="img" aria-label="${sc} percent of the steps done"><i style="width:${sc}%"></i></div><div class="small muted" style="margin-top:6px">${sc}% of the steps done</div>${hearDyn('readyHear','Hear my checklist')}</div>`;
+  const auto=['games','res','plan'].filter(on).map(id=>`<div class="traitrow"><span><b>${TRKM[id].t}</b><span class="small muted" style="display:block">${id==='games'?'Play the career games':'Build it in your Career Profile'}</span></span><span style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end">${stTag(v[id],t[id])}<button class="btn secondary sm" type="button" data-page="${id==='games'?'s-play':'s-profile'}">Open</button></span></div>`).join('');
+  const c1=!auto?'':`<div class="card mt"><h3>Done for you</h3><p class="small muted" style="margin-top:-6px">These update by themselves.</p>${auto}</div>`;
+  const c2=!on('cover')?'':`<div class="card mt"><h3>Cover letter</h3><div class="field"><label for="rdCover">Where are you with your cover letter?</label><select id="rdCover">${READY_STAGE.cover.map((s,i)=>`<option value="${i}" ${r.cover===i?'selected':''}>${s}</option>`).join('')}</select></div>${r.cvRev?'<span class="tag green">Reviewed by your TRC coach</span>':'<p class="small muted" style="margin:0">A TRC coach can review it with you.</p>'}</div>`;
+  const c3=!on('li')?'':`<div class="card mt"><h3>LinkedIn</h3><div class="field"><label for="rdLi">Where are you with your LinkedIn profile?</label><select id="rdLi">${READY_STAGE.li.map((s,i)=>`<option value="${i}" ${r.li===i?'selected':''}>${s}</option>`).join('')}</select></div><p class="small muted" style="margin:0">You keep your own login. ORBIT never asks for it.</p></div>`;
+  const n=r.social.filter(Boolean).length;
+  const c4=!on('social')?'':`<div class="card mt"><h3>Social media check</h3><p class="small muted" style="margin-top:-6px">Tick what is true for you. This is for you, and a coach can go through it with you. ${socialNote}</p>${SOCIAL_TIPS.map((s,i)=>`<label class="chk" style="display:flex;gap:10px;align-items:flex-start;padding:8px 0;font-size:14.5px"><input type="checkbox" id="rdSoc${i}" data-soc="${i}" ${r.social[i]?'checked':''}> <span>${s}</span></label>`).join('')}<div class="small muted" style="margin-top:6px">${n} of 6 checked</div></div>`;
+  const c5=!on('trc')?'':`<div class="card mt"><h3>TRC training</h3><p class="small muted" style="margin-top:-6px">Your coach marks these when you attend.</p>${TRC_SESS.map((s,i)=>`<div class="traitrow"><span>${s}</span>${r.trc[i]?'<span class="tag green">Attended</span>':'<span class="tag plain">Not yet</span>'}</div>`).join('')}</div>`;
+  return hero+c1+c2+c3+c4+c5;
+};
+AFTER['s-ready']=()=>{
+  const cv=$('#rdCover');if(cv)cv.onchange=()=>keep('rdCover',()=>{touchReady();S.ready.cover=+cv.value});
+  const li=$('#rdLi');if(li)li.onchange=()=>keep('rdLi',()=>{touchReady();S.ready.li=+li.value});
+  $$('[data-soc]').forEach(c=>c.onchange=()=>keep(c.id,()=>{touchReady();S.ready.social[+c.dataset.soc]=c.checked}));
+  const h=$('#readyHear');if(h)h.onclick=()=>hearNow(readySpeech(),h);
+};
+
+/* ---- parent ---- */
+RENDER['p-ready']=()=>{
+  const v=mayaVals(),t=mayaText(),sc=rdScore(v);
+  const rows=TRK.filter(x=>trkOn(x.id)).map(x=>`<tr><td><b>${x.t}</b></td><td>${stTag(v[x.id],t[x.id])}</td><td>${srcTag(x.src)}</td></tr>`).join('');
+  return `<div class="notice blue">Maya marks most of these herself. TRC records the training sessions. ${socialNote}</div>
+<div class="tiles mt"><div class="tile"><div class="k">Steps done</div><div class="v">${sc}%</div></div><div class="tile"><div class="k">Status</div><div class="v" style="font-size:20px">${rdBand(sc)[1]}</div></div><div class="tile"><div class="k">TRC sessions</div><div class="v">${S.ready.trc.filter(Boolean).length} of 4</div></div></div>
+<div class="card mt"><h3>Maya's checklist</h3><div class="tablewrap"><table><thead><tr><th>Step</th><th>Where Maya is</th><th>Who fills it in</th></tr></thead><tbody>${rows}</tbody></table></div></div>
+<div class="grid g2 mt"><div class="card"><h3>Ways to help</h3><ul style="font-size:14px;line-height:1.8;padding-left:18px;margin:0;color:var(--text-dim)"><li>Ask Maya to show you her checklist and pick one step for this week.</li><li>Go through the social media check together. It is her choice what to change.</li><li>Ask about the next TRC session.</li></ul></div>
+<div class="card"><h3>Who can see it</h3><p style="font-size:14px;line-height:1.65;margin:0;color:var(--text-dim)">Shared with: ${sharedList()}. The office sees whether the social media check is complete, never what is on any account. Cohort statistics are currently <b>${S.consent.cohort?'on':'off'}</b>.</p></div></div>`;
+};
+
+/* ---- Sherrita ---- */
+RENDER['o-ready']=()=>{
+  const v=mayaVals(),act=S.consent.obo?`<div class="card mt"><h3>Record a next step for Maya</h3><p class="small muted" style="margin-top:-6px">Shown because Maya's family shares with this office. Entries appear in the family's access log.</p><div class="grid g2"><div class="field"><label for="rdWbl">Work-based learning</label><select id="rdWbl">${READY_STAGE.wbl.map((s,i)=>`<option value="${i}" ${S.ready.wbl===i?'selected':''}>${s}</option>`).join('')}</select></div><div class="field"><label for="rdPost">Postsecondary</label><select id="rdPost">${READY_STAGE.post.map((s,i)=>`<option value="${i}" ${S.ready.post===i?'selected':''}>${s}</option>`).join('')}</select></div></div></div>`:'';
+  return readyDash(false)+act+`<div class="card mt"><h3>What is tracked and where it comes from</h3>${trackTable(false)}</div>`;
+};
+AFTER['o-ready']=()=>{
+  if(S.consent.obo&&!(S.audit[0]&&S.audit[0].what==='Viewed the Readiness Dashboard'))logA('Sherrita (OBO)','Viewed the Readiness Dashboard');
+  const w=$('#rdWbl');if(w)w.onchange=()=>keep('rdWbl',()=>{S.ready.wbl=+w.value;logA('Sherrita (OBO)','Recorded work-based learning step: '+READY_STAGE.wbl[S.ready.wbl])});
+  const p=$('#rdPost');if(p)p.onchange=()=>keep('rdPost',()=>{S.ready.post=+p.value;logA('Sherrita (OBO)','Recorded postsecondary step: '+READY_STAGE.post[S.ready.post])});
+};
+
+</script>
+<script>
+/* ================= pages ================= */
+const bizRows=[
+  {emp:'Lakeland Regional Health',what:'Hosts Project SEARCH: a one-year, full-day hospital internship for students ages 18 to 22, run with Polk County Public Schools',type:'Host employer',kind:'employer',cl:'health',stage:'Existing program with Polk Schools',tag:'green'},
+  {emp:'Florida Vocational Rehabilitation',what:'Project SEARCH (ages 18 to 21), career camps and pre-employment transition services (ages 14 to 22)',type:'State agency',fit:'all',stage:'Not yet contacted about ORBIT',tag:'orange'},
+  {emp:'employU',what:'Transition youth services, paid work experience and vocational evaluations for people with disabilities',type:'Employment provider',fit:'all',stage:'Not yet contacted about ORBIT',tag:'orange'},
+  {emp:'CareerSource Polk',what:'On-the-job training that reimburses up to 50 or 75% of wages during training, plus employer services',type:'Workforce board',fit:'all',stage:'Not yet contacted about ORBIT',tag:'orange'},
+  {emp:'Southeastern University: SEU Link',what:'Comprehensive transition program for students ages 18 to 30 with documented intellectual disability. Fall applications close Dec 15',type:'Post-secondary',fit:'elig',stage:'Deadline Dec 15',tag:'orange'},
+  {emp:'Center for Independent Living in Central Florida',what:'Job-retention support for Project SEARCH graduates',type:'Nonprofit',fit:'all',stage:'Not yet contacted about ORBIT',tag:'orange'}
+];
+
+
+const LIVE_ASOF='September 29, 2026';
+const LOCAL_OPPS=[
+ {t:'City of Lakeland School-to-Work: paid internships',org:'City of Lakeland',kind:'Internship',cl:'all',when:'Each semester',who:'Open to high school, technical and college students. Positions are listed under Internship on the city careers portal.',url:'https://www.lakelandgov.net/departments/human-resources/school-to-work-program/',contact:'School-to-Work-program@lakelandgov.net · 863.834.6007'},
+ {t:'City of Lakeland School-to-Work: job shadowing',org:'City of Lakeland',kind:'Job shadow',cl:'all',when:'Ask the program',who:'Unpaid internships and job shadowing for secondary and post-secondary students. Needs an Unpaid Internship Form.',url:'https://www.lakelandgov.net/departments/human-resources/school-to-work-program/',contact:'School-to-Work-program@lakelandgov.net · 863.834.6007'},
+ {t:'CareerSource Polk Youth Internship',org:'CareerSource Polk',kind:'Internship',cl:'all',when:'Year-round',who:'Out-of-school youth ages 16 to 24, with private, nonprofit and public employers. The page does not list pay or hours, so ask. Fits students who have left school or aged out.',url:'https://www.careersourcepolk.com/youth-services/youth-internship/',contact:'(863) 508-1100 · Lakeland Career Center, 309 N. Ingraham Ave.'},
+ {t:'Polk County job fair: Your Future Starts Here',org:'Polk County Government and Sheriff’s Office',kind:'Event',cl:'all',when:'Oct 17, 2026, 10 a.m. to 2 p.m.',who:'Open positions with Polk County, with on-site resume help. Sheriff’s Office ProCap Room, 1891 Jim Keene Blvd., Winter Haven.',url:'https://www.polkfl.gov/events/your-future-starts-here-serving-polk-county-together/',contact:'See the event page'},
+ {t:'CareerSource Polk orientation, Lakeland',org:'CareerSource Polk',kind:'Event',cl:'all',when:'Thursdays, 9 to 10 a.m., through April 2027',who:'Weekly orientation to career center services at no cost. The site says children are not allowed at career centers, so this suits students 18 and older.',url:'https://www.careersourcepolk.com/career-seekers/career-seeker-events/',contact:'(863) 508-1100'},
+ {t:'Publix: current Lakeland openings',org:'Publix',kind:'Live openings',cl:['retail','hospitality','business'],when:'Live search',who:'Opens Publix’s own job search for Lakeland. Look together with a job coach or teacher. Publix has not been contacted about ORBIT.',url:'https://jobs.publix.com/jobs/?location=lakeland-fl&location_name=Lakeland+Fl',contact:'Apply on the Publix site'},
+ {t:'Internships in Lakeland (Indeed)',org:'Indeed',kind:'Live openings',cl:'all',when:'Live search',who:'A live search of current internship listings in Lakeland. Listings change daily and are not checked for accessibility or fit.',url:'https://www.indeed.com/q-Internship-l-Lakeland,-FL-jobs.html',contact:'Apply on Indeed'},
+ {t:'Project SEARCH at Lakeland Regional Health',org:'Lakeland Regional Health with Polk County Public Schools',kind:'Program',cl:['health'],when:'School-year program, ages 18 to 22',who:'One-year, full-day hospital internship. Ask the school transition team how students are referred.',url:'https://www.mylrh.org/project-search-program-at-lakeland-regional-health-graduates-eighth-class-of-job-ready-students-with-disabilities/',contact:'Through the school transition team'},
+ {t:'SEU Link, Southeastern University',org:'Southeastern University',kind:'Program',cl:'elig',when:'Fall applications close Dec 15',who:'Transition program for ages 18 to 30 with documented intellectual disability. Depends on eligibility, not game results.',url:'https://seu.edu/academics/ese/link/admission/',contact:'See the admission page'}
+];
+const OPP_KINDS=['All','Internship','Job shadow','Event','Live openings','Program'];
+S.oppF='All';
+function oppFit(o){
+  if(o.cl==='all')return '<span class="small muted">Open to every area</span>';
+  if(o.cl==='elig')return '<span class="small muted">Depends on eligibility</span>';
+  if(!S.consent.obo)return '<span class="tag plain">Not shared</span>';
+  if(!hasData())return '<span class="tag plain">No results yet</span>';
+  const st=Object.fromEntries(stats().map(s=>[s.id,s])),order={strong:3,explore:2,low:1};
+  let best=null;o.cl.forEach(id=>{const s=st[id];if(s&&(!best||(order[s.band]||0)>(order[best.band]||0)))best=s});
+  return best?fitTag(best.band)+(best.score==null?'':` <span class="small muted">${best.score} / 100</span>`):'';
+}
+function liveOppsHtml(){
+  const rows=LOCAL_OPPS.filter(o=>S.oppF==='All'||o.kind===S.oppF);
+  const chips=`<div class="chips" style="margin-bottom:12px">${OPP_KINDS.map(k=>`<button type="button" class="chip" data-oppf="${k}" aria-pressed="${S.oppF===k}">${k}</button>`).join('')}</div>`;
+  return chips+`<div class="tablewrap"><table><thead><tr><th>Opportunity</th><th>Type</th><th>When</th><th>Details</th><th>Fit for Maya</th><th>Link</th></tr></thead><tbody>${rows.map(o=>`<tr><td><b>${o.t}</b><div class="small muted">${o.org}</div></td><td><span class="tag ${o.kind==='Event'?'gold':o.kind==='Live openings'?'green':o.kind==='Program'?'purple':'blue'}">${o.kind}</span></td><td>${o.when}</td><td>${o.who}<div class="small muted" style="margin-top:4px">${o.contact}</div></td><td>${oppFit(o)}</td><td><a href="${o.url}" target="_blank" rel="noopener">Open page</a></td></tr>`).join('')||'<tr><td colspan="6">Nothing in this group.</td></tr>'}</tbody></table></div><p class="small muted" style="margin:12px 0 0">Read from public pages on ${LIVE_ASOF}. The two live-search rows open other sites' current listings. Connecting a live job feed inside ORBIT would be scoped as part of the pilot build.</p>`;
+}
+
+/* ---- student ---- */
+RENDER['s-home']=()=>`<div class="card hero"><div class="kicker">Career discovery</div><h3 style="margin:6px 0 8px;font-size:26px">Hi Maya. Ready to see what you like?</h3>
+<p class="muted" style="font-size:15px;line-height:1.6;max-width:60ch">Play short games and find jobs and classes that match what you enjoy. It takes about ten minutes.</p>
+<ul style="font-size:14px;line-height:1.8;padding-left:18px;color:var(--text-dim)"><li>Some games have right answers. Some are only about what you like.</li><li>You can skip any game.</li><li>Your family decides who else sees your results.</li></ul>
+<div class="hearrow" style="justify-content:flex-start;margin:0 0 4px">${hearBtn('Hi Maya. Ready to see what you like? Play short games and find jobs and classes that match what you enjoy. It takes about ten minutes. Some games have right answers. Some are only about what you like. You can skip any game.')}</div>
+<div class="row"><button class="btn big" type="button" data-act="start">${hasData()?'Play again':'Start'}</button>${hasData()?'<button class="btn secondary big" type="button" data-goto="student:s-results">See my results</button>':''}</div>
+${hasData()?'<p class="small muted" style="margin:12px 0 0">Playing again replaces your earlier results.</p>':''}</div>
+<div class="card mt"><h3>Make it work for you</h3><p class="small muted" style="margin-top:-6px">Need the games read out loud? Need bigger buttons or more time? Set it up here.</p><div class="row"><button class="btn secondary" type="button" data-page="s-support">🔊 Hear It &amp; Supports</button>${accList().length?`<span class="tag green">On: ${accList().join(', ')}</span>`:'<span class="tag plain">Nothing turned on</span>'}</div></div>`;
+
+/* ---- supports: read aloud and other accommodations (student and parent share one state) ---- */
+const accStatus=()=>S.acc.hear?`Read aloud is <b>on</b>${S.acc.by?', turned on by the '+S.acc.by.toLowerCase():''}.`:'Read aloud is <b>off</b>.';
+const accControls=(p,me)=>`<div class="card"><h3>🔊 Hear it read aloud</h3><p class="small muted" style="margin-top:-6px">${me?'Turn this on and every game card, question, choice and result can be read out loud.':'Turn this on for Maya. Every game card, question, choice and result can be read out loud.'} It does not change points.</p>
+${toggleRow(p+'Hear','Read aloud','Adds a 🔊 Hear it button to every screen.',S.acc.hear)}
+${toggleRow(p+'Auto','Read each screen automatically','New cards, questions and choices are read as they appear.',S.acc.auto)}
+<div class="rule" style="margin-top:12px"><div class="rule-top"><b>Reading speed</b></div><div class="seg" role="group" aria-label="Reading speed"><button type="button" data-rate="normal" class="${S.acc.rate==='slow'?'':'on'}">Normal</button><button type="button" data-rate="slow" class="${S.acc.rate==='slow'?'on':''}">Slow</button></div></div>
+<div class="row" style="margin-top:14px"><button class="hear" type="button" id="${p}Test">🔊 Try it</button></div>
+<p class="small" id="${p}Stat" style="margin:12px 0 0">${accStatus()}</p>
+<div class="insight gold" style="margin-top:12px"><b>Listening time is not held against ${me?'you':'Maya'}.</b> With read aloud on, a card counts as held attention ${R.hearAllowMs/1000} seconds later than usual, so time spent listening does not cost interest points.</div>
+<p class="small muted" style="margin:10px 0 0">The voice comes from the device. If nothing plays, check the volume or use headphones. Read aloud is a common IEP accommodation. The school team decides whether to record it there.</p></div>
+<div class="card mt"><h3>Other supports</h3>${toggleRow(p+'Big','Larger buttons','Bigger targets in every game.',S.acc.big)}${toggleRow(p+'Extra','Extra time','Memory games show each step for longer.',S.acc.extra)}</div>`;
+function accBind(p,who){
+  const stat=()=>{const el=$('#'+p+'Stat');if(el)el.innerHTML=accStatus()};
+  const of=who==='Parent'?' for Maya':'';
+  $('#'+p+'Hear').onchange=e=>{S.acc.hear=e.target.checked;S.acc.by=S.acc.hear?who:S.acc.by;logA(who,`Turned ${S.acc.hear?'on':'off'} read aloud${of}`);if(S.acc.hear)speak('Read aloud is on.');else stopSpeak();stat()};
+  $('#'+p+'Auto').onchange=e=>{S.acc.auto=e.target.checked;logA(who,`Turned ${S.acc.auto?'on':'off'} automatic reading${of}`)};
+  $$('.seg button',$('#'+p+'Hear').closest('.card')).forEach(b=>b.onclick=()=>{S.acc.rate=b.dataset.rate;$$('.seg button',b.parentNode).forEach(x=>x.classList.toggle('on',x===b));logA(who,`Set reading speed to ${S.acc.rate}${of}`);hearNow('This is the reading speed.',b)});
+  $('#'+p+'Test').onclick=e=>hearNow('This is how read aloud sounds. Career discovery games, with jobs and classes that match what you enjoy.',e.currentTarget);
+  $('#'+p+'Big').onchange=e=>{S.acc.big=e.target.checked;document.body.classList.toggle('big',S.acc.big);logA(who,`Turned ${S.acc.big?'on':'off'} larger buttons${of}`)};
+  $('#'+p+'Extra').onchange=e=>{S.acc.extra=e.target.checked;logA(who,`Turned ${S.acc.extra?'on':'off'} extra time${of}`)};
+}
+RENDER['s-support']=()=>accControls('st',true);
+AFTER['s-support']=()=>accBind('st','Student');
+RENDER['p-support']=()=>`<div class="notice blue">These supports change how Maya plays. They never change what the games score. The student can also change them in her own view, and every change is logged.</div><div class="mt">${accControls('pa',false)}</div>`;
+AFTER['p-support']=()=>accBind('pa','Parent');
+
+RENDER['s-play']=()=>'<div id="playRoot"></div>';
+AFTER['s-play']=()=>playView();
+
+RENDER['s-results']=()=>{
+  if(!hasData())return `<div class="card">${emptyHtml('You have not played yet. Try a few games. It takes about ten minutes.')}<div class="center mt"><button class="btn big" type="button" data-act="start">Start</button></div></div>`;
+  const r=ranked().filter(s=>s.score!=null),best=r.filter(s=>s.band==='strong'||s.band==='explore').slice(0,3);
+  return `<div class="card hero"><div class="kicker">Your results</div><h3 style="margin:6px 0 8px">Here is what you liked, Maya.</h3><p class="muted" style="font-size:15px;line-height:1.6;max-width:60ch;margin:0">You played ${played().length} game${played().length===1?'':'s'}${skipped().length?` and skipped ${skipped().length}. Skipping is okay`:''}. These are ideas to try, not rules. You, your family and your school team decide what comes next.</p><div class="hearrow" style="justify-content:flex-start;margin-top:10px">${hearBtn('Here is what you liked, Maya. Your top picks are '+(best.map(s=>CLM[s.id].name).join(', ')||'not clear yet')+'. Your style: '+(riTop().map(s=>RIM[s.id].stu).join(', ')||'not clear yet')+'. These are ideas to try, not rules.')}</div></div>
+<h3 style="margin:22px 0 12px;font-size:19px">Top picks for you</h3>
+${best.map(s=>pathCard(s,'student')).join('')||emptyHtml('Nothing stood out yet. Play again to give us more to go on.')}
+${riBlock('student','How you like to work')}
+<div class="card mt"><h3>Everything you tried</h3>${r.map(s=>meter(s,'student')).join('')}</div>
+<div class="row mt"><button class="btn secondary" type="button" data-act="start">Play again</button></div>`;
+};
+
+/* ---- parent ---- */
+const liveWord=()=>S.session.active?'In progress':S.live?'Just finished':'Session of Sept 21';
+const sharedList=()=>{const a=[];if(S.consent.team)a.push('School transition team');if(S.consent.obo)a.push('Office of Business Opportunities');if(S.consent.employers)a.push('Approved employers');return a.length?a.join(', '):'Nobody outside the family'};
+const parentNotes=()=>`<div class="grid g2 mt"><div class="card"><h3>What this is</h3><ul style="font-size:14px;line-height:1.75;padding-left:18px;margin:0;color:var(--text-dim)"><li>A set of short games that shows what Maya enjoys and where she does well.</li><li>A starting point for talking about jobs, work-based learning and school after graduation.</li><li>One more input for the school team, alongside her IEP and teacher notes.</li></ul></div><div class="card"><h3>What this is not</h3><ul style="font-size:14px;line-height:1.75;padding-left:18px;margin:0;color:var(--text-dim)"><li>Not a test, a grade or a diagnosis.</li><li>Not a placement decision. Nothing happens without the family.</li><li>Not shared with employers unless you approve it.</li></ul></div></div>`;
+RENDER['p-home']=()=>{
+  const r=ranked().filter(s=>s.score!=null),best=r.filter(s=>s.band==='strong'||s.band==='explore').slice(0,3);
+  const head=`<div class="card hero"><div class="studenthead"><div class="avatar">MR</div><div><div class="kicker">Career discovery · ${liveWord()}</div><h3 style="margin:4px 0">Maya's game results</h3><div class="muted">Grade 11 · Composite student for this demo</div></div></div></div>`;
+  if(!hasData())return head+`<div class="card mt">${emptyHtml("Maya has no game results yet. Switch to the student view to play, or reset the demo data.")}</div>`+parentNotes();
+  const tiles=`<div class="tiles mt"><div class="tile"><div class="k">Games played</div><div class="v">${played().length}</div></div><div class="tile"><div class="k">Games skipped</div><div class="v">${skipped().length}</div></div><div class="tile"><div class="k">Time playing</div><div class="v">${mmss(totalMs())}</div></div><div class="tile"><div class="k">Shared with</div><div class="small" style="margin-top:8px;line-height:1.4;font-weight:600">${sharedList()}</div></div></div>`;
+  const top=`<div class="card mt"><h3>Where Maya's points are highest</h3>${best.length?best.map(s=>meter(s,'parent')).join(''):emptyHtml('No area has enough points yet. Another session would help.')}<div class="row" style="margin-top:14px"><button class="btn secondary sm" type="button" data-page="p-results">See all areas</button><button class="btn secondary sm" type="button" data-page="p-paths">See pathways</button></div></div>`;
+  const ri=riBlock('parent','How Maya likes to work');
+  const b0=best[0]?CLM[best[0].id]:null;
+  const talk=`<div class="card mt"><h3>Ways to talk about it with Maya</h3><ul style="font-size:14px;line-height:1.8;padding-left:18px;margin:0;color:var(--text-dim)">${b0?`<li>Ask Maya what she liked about ${b0.short}.</li><li>Look together at one way to try it: ${b0.wbl[0].toLowerCase()}.</li>`:'<li>Ask Maya which games she enjoyed most and which she skipped.</li>'}<li>Bring these results to the next transition meeting so the school team can add them to her plan.</li></ul></div>`;
+  return head+tiles+top+ri+talk+parentNotes();
+};
+RENDER['p-results']=()=>{
+  if(!hasData())return `<div class="card">${emptyHtml('No results yet.')}</div>`;
+  const rows=S.order.map(gid=>{const g=GM[gid],r=S.games[gid];return `<tr><td><b>${g.e} ${g.name}</b></td><td>${g.what}</td><td>${gameSummary(gid)}</td><td>${r.status==='skipped'?'—':mmss(r.ms)}</td><td>${r.status==='played'?'<span class="tag green">Played</span>':'<span class="tag orange">Skipped</span>'}</td></tr>`}).join('');
+  const cardRows=S.order.filter(g=>GM[g].type==='swipe'&&S.games[g].status==='played').flatMap(gid=>S.games[gid].cards.map(c=>{const g=GM[gid],d=g.deck[c.i],p=cardPts(c);return `<tr><td>${g.name}</td><td>${d.e} ${d.t}</td><td>${(c.dwell/1000).toFixed(1)} s</td><td>${c.act==='like'?'♥ Liked':'Passed'}</td><td>${p>0?'+':''}${p}</td></tr>`})).join('');
+  return `<div class="card"><h3>All eight areas</h3><p class="small muted" style="margin-top:-6px">Each bar is a score out of 100. Confidence goes up when more than one game points to the same area. Strong fit needs ${R.strongMin}+ and at least two games. Explore starts at ${R.exploreMin}.</p>${ranked().map(s=>meter(s,'parent')).join('')}</div>
+${riBlock('parent','All six interest styles (RIASEC)')}
+<div class="card mt"><h3>Ways to try each interest style</h3><div class="tablewrap"><table><thead><tr><th>Style</th><th>What it looks like</th><th>Try next</th></tr></thead><tbody>${RI.map(r=>`<tr><td><b>${r.ic} ${r.id} · ${r.name}</b></td><td>${r.d}</td><td>${r.next}</td></tr>`).join('')}</tbody></table></div></div>
+<div class="card mt"><h3>What each game saw</h3><div class="tablewrap"><table><thead><tr><th>Game</th><th>What it looks at</th><th>What happened</th><th>Time</th><th>Status</th></tr></thead><tbody>${rows}</tbody></table></div><p class="small muted" style="margin:12px 0 0">A skipped game counts as a small signal (${R.skipScore} out of 100), not a verdict. It can mean not interested or not right now. Speed is recorded but never scored.</p></div>
+<div class="card mt"><h3>Card by card</h3><p class="small muted" style="margin-top:-6px">Only the family and the program admin can see this level of detail. The Office of Business Opportunities sees summaries.</p><div class="tablewrap"><table><thead><tr><th>Game</th><th>Card</th><th>Time on card</th><th>Action</th><th>Points</th></tr></thead><tbody>${cardRows}</tbody></table></div></div>`;
+};
+RENDER['p-paths']=()=>{
+  const best=ranked().filter(s=>s.band==='strong'||s.band==='explore').slice(0,3);
+  return `<div class="notice blue">Ideas to explore together. Southeastern University program lists and admission requirements change, so confirm details with the school before planning.</div>
+<div class="mt">${hasData()?(best.map(s=>pathCard(s,'parent')).join('')||emptyHtml('No area has enough points yet.')):emptyHtml('No results yet, so there are no pathways to show.')}</div>
+<div class="card mt"><h3>Also ask about</h3><div class="insight gold"><b>Southeastern University transition program.</b> ${SEU_TRANSITION}</div><div class="insight"><b>On-the-job training support.</b> Sherrita's office mentioned a grant that can help employers pay for training. Details are still being confirmed.</div></div>`;
+};
+RENDER['p-consent']=()=>{
+  const raw=S.rawOpen?`<pre class="raw">${esc(JSON.stringify({practiceCardMs:S.baseline,gamesInOrder:S.order,games:S.games,careerProfile:S.profile},null,1))}</pre>`:'';
+  const del=S.delArmed?`<div class="lock" style="margin-top:12px"><b>Delete all of Maya's game data, Career Profile and readiness checklist?</b>This removes her results, strengths, resume and plan from every view. It cannot be undone.<div class="row" style="margin-top:10px"><button class="btn danger sm" id="delGo" type="button">Yes, delete it</button><button class="btn secondary sm" id="delNo" type="button">Keep it</button></div></div>`:`<button class="btn secondary sm" id="delArm" type="button" style="margin-top:12px">Delete Maya's game data and Career Profile</button>`;
+  return `<div class="card"><h3>Who can see Maya's results</h3><p class="small muted" style="margin-top:-6px">You decide. Changes take effect right away in the other views.</p>
+${toggleRow('tgTeam','School transition team','ESE teachers and counselors who help plan Maya\'s next steps.',S.consent.team)}
+${toggleRow('tgObo','Office of Business Opportunities','Sherrita\'s team, to match Maya with work-based learning and employers.',S.consent.obo)}
+${toggleRow('tgEmp','Employer partners','Only employers you approve one by one. Off means no employer sees anything.',S.consent.employers)}
+${toggleRow('tgCohort','Counts in cohort statistics',"Maya's top area is counted with other students. No name is attached.",S.consent.cohort)}</div>
+<div class="grid g2 mt"><div class="card"><h3>What was recorded</h3><p class="small muted" style="margin-top:-6px">Time on cards, answers, choices and skipped games, plus what Maya types and picks in her Career Profile. Nothing else.</p><button class="btn secondary sm" id="rawBtn" type="button">${S.rawOpen?'Hide':'Show'} the raw data</button>${raw}</div>
+<div class="card"><h3>Your data</h3><p class="small muted" style="margin-top:-6px">You can delete Maya's game data, Career Profile and readiness checklist at any time.</p>${del}</div></div>
+<div class="card mt"><h3>Who has looked</h3><div id="consentLog"></div></div>`;
+};
+function renderConsentLog(){
+  const el=$('#consentLog');if(!el)return;
+  const rows=S.audit.filter(a=>a.who!=='Program Admin'||/viewed/i.test(a.what)).slice(0,8);
+  el.innerHTML=rows.map(a=>`<div class="traitrow"><span><b>${a.who}</b> · ${a.what}</span><span class="small muted">${a.t}</span></div>`).join('')||'<div class="small muted">No activity yet.</div>';
+}
+AFTER['p-consent']=()=>{
+  [['tgTeam','team','the school transition team'],['tgObo','obo','the Office of Business Opportunities'],['tgEmp','employers','employer partners'],['tgCohort','cohort','cohort statistics']].forEach(([id,key,label])=>{
+    const el=$('#'+id);el.onchange=()=>{S.consent[key]=el.checked;logA('Parent',key==='cohort'?`Turned ${el.checked?'on':'off'} cohort statistics`:`Turned ${el.checked?'on':'off'} sharing with ${label}`);renderConsentLog();updateDemoBar()};
+  });
+  $('#rawBtn').onclick=()=>{S.rawOpen=!S.rawOpen;refresh()};
+  const a=$('#delArm');if(a)a.onclick=()=>{S.delArmed=true;refresh()};
+  const n=$('#delNo');if(n)n.onclick=()=>{S.delArmed=false;refresh()};
+  const g=$('#delGo');if(g)g.onclick=()=>{S.games={};S.order=[];S.baseline=null;S.live=false;S.session={active:false,finished:false};S.profile=blankProfile();S.ready=blankReady();S.readyLogged=false;S.delArmed=false;logA('Parent',"Deleted Maya's game data, Career Profile and readiness checklist");refresh()};
+  renderConsentLog();
+};
+RENDER['p-how']=()=>{
+  const {lo,hi}=thr();
+  return `<div class="card"><h3>What the games look at</h3><div class="tablewrap"><table><thead><tr><th>Signal</th><th>How it earns points</th></tr></thead><tbody>
+<tr><td><b>Time on a card</b></td><td>Staying on a card ${(hi/1000).toFixed(1).replace('.0','')} seconds or longer earns +1. Passing in under ${(lo/1000).toFixed(1)} seconds counts as low interest (−1).</td></tr>
+<tr><td><b>Tapping ♥</b></td><td>Adds half a point.</td></tr>
+<tr><td><b>Right answers</b></td><td>Sorting, triage, scam spotting and build order score by how many answers are right.</td></tr>
+<tr><td><b>Interest styles</b></td><td>Six styles (hands-on, investigative, artistic, social, enterprising, conventional) come from Maya's choices in the preference games and from the career areas each game feeds. They describe what she enjoys, not what she can do.</td></tr>
+<tr><td><b>Choices</b></td><td>Poster and customer games have no wrong answers about taste. Each choice points toward the areas it fits.</td></tr>
+<tr><td><b>Skipping</b></td><td>A skipped game counts as ${R.skipScore} out of 100 for the areas it covers, at less weight than a played game.</td></tr></tbody></table></div></div>
+<div class="grid g2 mt"><div class="card"><h3>Built to be fair</h3><ul style="font-size:14px;line-height:1.75;padding-left:18px;margin:0;color:var(--text-dim)"><li>${R.useBaseline?'A practice card measures how quickly each student usually acts, and the limits adjust to it.':'Fixed limits apply to every student.'}</li><li>Speed is never scored. Taking longer does not cost points.</li><li>Every game can be skipped without a penalty beyond that small signal.</li><li>Read aloud, larger buttons and extra time are one tap away. Listening time is not held against Maya.</li><li>Points show interest and strengths. They make no clinical claim.</li></ul></div>
+<div class="card"><h3>How the next game is chosen</h3><p style="font-size:14px;line-height:1.65;margin:0;color:var(--text-dim)">Every student starts with two warm-up games. After that, the game most related to what is scoring highest comes next, with a small boost for areas that have not been tried. A student who lingers on design and media cards is offered design and marketing next. Each student sees up to ${R.perSession} games.</p></div></div>
+<div class="card mt"><h3>Your data</h3><p style="font-size:14px;line-height:1.65;margin:0;color:var(--text-dim)">You control who sees Maya's results, and you can see the raw data or delete it under Privacy &amp; Sharing. Final privacy terms are set with the district before any real student plays.</p></div>`;
+};
+
+/* ---- Sherrita: cohort dashboard ---- */
+const COHORT_BASE={retail:6,business:5,hospitality:8,media:6,health:4,helping:5,tech:3,hands:4};
+const COHORT_ROWS=[
+ {n:'Student A',gr:11,g:'6 / 0',top:'hospitality',ev:'High',cd:'S · E · R'},{n:'Student B',gr:12,g:'6 / 1',top:'helping',ev:'Medium',cd:'S · A · I'},
+ {n:'Student C',gr:12,g:'5 / 1',top:'retail',ev:'Medium',cd:'E · A · S'},{n:'Student D',gr:11,g:'6 / 0',top:'hands',ev:'High',cd:'R · C · I'},{n:'Student E',gr:11,g:'4 / 2',top:null,ev:'Low',cd:'—'}];
+RENDER['o-cohort']=()=>{
+  const counts={...COHORT_BASE};let n=41,incl=false;const top=topOne();
+  if(S.consent.cohort&&hasData()&&top){counts[top.id]++;n++;incl=true}
+  const emp={};bizRows.filter(b=>b.kind==='employer').forEach(b=>emp[b.cl]=(emp[b.cl]||0)+1);
+  const rows=CL.map(k=>({k,s:counts[k.id],e:emp[k.id]||0})).sort((a,b)=>b.s-a.s||a.k.name.localeCompare(b.k.name));
+  const max=Math.max(...rows.map(r=>Math.max(r.s,r.e)),1);
+  const gaps=rows.filter(r=>r.s>=3&&r.e===0);
+  const h=counts.hospitality;
+  const bar=(v,c)=>`<div class="ln"><div class="trk"><i style="width:${v/max*100}%;background:var(${c})"></i></div><span class="num">${v}</span></div>`;
+  const chart=rows.map(r=>`<div class="hb"><div class="nm">${r.k.ic} ${r.k.name}</div><div class="bars">${bar(r.s,'--series-a')}${bar(r.e,'--series-b')}</div></div>`).join('');
+  const tbl=rows.map(r=>`<tr><td>${r.k.name}</td><td>${r.s}</td><td>${r.e}</td></tr>`).join('');
+  let mayaRow;
+  if(!S.consent.obo)mayaRow='<tr><td><b>Maya R.</b></td><td>11</td><td>—</td><td>—</td><td>—</td><td>—</td><td><span class="tag orange">Not shared</span></td></tr>';
+  else if(!hasData())mayaRow='<tr><td><b>Maya R.</b></td><td>11</td><td>0 / 0</td><td>—</td><td>—</td><td>—</td><td><span class="tag green">Shared</span></td></tr>';
+  else mayaRow=`<tr><td><b>Maya R.</b> ${S.session.active?'<span class="tag green">Playing now</span>':S.live?'<span class="tag green">Just finished</span>':''}</td><td>11</td><td>${played().length} / ${skipped().length}</td><td>${top?CLM[top.id].name:'—'}</td><td>${riCodeStr()}</td><td>${top?top.conf:'—'}</td><td><span class="tag green">Shared</span></td></tr>`;
+  const others=COHORT_ROWS.map(r=>`<tr><td>${r.n}</td><td>${r.gr}</td><td>${r.g}</td><td>${r.top?CLM[r.top].name:'Not enough evidence'}</td><td>${r.cd}</td><td>${r.ev}</td><td><span class="tag green">Shared</span></td></tr>`).join('');
+  return `<div class="notice blue">Illustrative cohort of 42 juniors and seniors. Maya R. is the one live student, and appears here only as far as her family allows.</div>
+<div class="tiles mt"><div class="tile"><div class="k">In the cohort</div><div class="v">42</div></div><div class="tile"><div class="k">Finished Discovery</div><div class="v">31</div></div><div class="tile"><div class="k">Avg games played</div><div class="v">5.8</div></div><div class="tile"><div class="k">Skipped games</div><div class="v">14%</div></div></div>
+<div class="card mt"><h3>Where student interest sits, and where employers are</h3><p class="small muted" style="margin-top:-6px">Each student is counted once, under the area where their points are highest. ${incl?"Maya's top area is included.":!S.consent.cohort?"Maya is not counted because her family turned off cohort statistics.":'Maya has no results to count yet.'} Total counted: ${n}.</p>
+<div class="legend"><span><i style="background:var(--series-a)"></i>Students</span><span><i style="background:var(--series-b)"></i>Employer partners in the pipeline</span></div>${chart}
+<details style="margin-top:12px"><summary class="small" style="cursor:pointer;font-weight:600">Show as a table</summary><div class="tablewrap" style="margin-top:8px"><table><thead><tr><th>Area</th><th>Students</th><th>Employers</th></tr></thead><tbody>${tbl}</tbody></table></div></details></div>
+<div class="grid g2 mt"><div class="card"><h3>What this suggests</h3>
+<div class="insight"><b>The cafeteria track fits a minority.</b> ${h} of ${n} students (${Math.round(h/n*100)}%) lead with hospitality, the area the culinary pathway serves. The other ${n-h} lead somewhere else.</div>
+<div class="insight gold"><b>Employer gaps to fill first.</b> ${gaps.length?gaps.map(g=>`${g.k.name} (${g.s} students)`).join(', ')+' have students and no employer partners yet.':'Every area with students has at least one employer partner.'}</div></div>
+<div class="card"><h3>What Sherrita can do from here</h3><ul style="font-size:14px;line-height:1.8;padding-left:18px;margin:0;color:var(--text-dim)"><li>Recruit employers in the areas above, starting with the largest gaps.</li><li>Open the Readiness Dashboard to see who is ready to match and who needs a nudge.</li><li>Open a student's profile to see matched paths, with family approval.</li><li>Use the Opportunity Matching tab to line students up with employers already in the pipeline.</li></ul></div></div>
+<div class="card mt"><h3>Students</h3><div class="tablewrap"><table><thead><tr><th>Student</th><th>Grade</th><th>Played / skipped</th><th>Top area</th><th>Interest code</th><th>Confidence</th><th>Family sharing</th></tr></thead><tbody>${mayaRow}${others}</tbody></table></div><p class="small muted" style="margin:12px 0 0">Card-by-card timing is never shown here. The office sees areas, scores and summaries.</p></div>`;
+};
+
+/* ---- hooks on the existing pages ---- */
+HOOK.overview=()=>{
+  const v=$('#ovMatchV'),s=$('#ovMatchS');
+  if(!S.consent.obo){v.textContent='—';s.textContent='Family has not shared results';return}
+  if(!hasData()){v.textContent='0';s.textContent='No game results yet';return}
+  const st=stats(),a=st.filter(x=>x.band==='strong').length,b=st.filter(x=>x.band==='explore').length;
+  v.textContent=a+b;s.textContent=`${a} strong · ${b} explore`;
+};
+HOOK.readiness=()=>{$('#rdGame').innerHTML=discoveryCard()};
+HOOK.discovery=()=>{
+  const el=$('#dcMaya'),st=ranked().filter(s=>s.score!=null&&(s.band==='strong'||s.band==='explore'));
+  if(!S.consent.obo)el.innerHTML='<div class="insight" style="margin-top:16px"><b>Maya\'s result:</b> Not shared. Her family has not approved sharing with this office.</div>';
+  else if(!hasData()||!st.length)el.innerHTML='<div class="insight" style="margin-top:16px"><b>Maya\'s result so far:</b> No results yet.</div>';
+  else{const a=st.slice(0,2).map(s=>CLM[s.id].name);el.innerHTML=`<div class="insight" style="margin-top:16px"><b>Maya's result so far:</b> Strongest in ${a.join(' and ')}, from ${played().length} games. Interest code: ${riCodeStr()}. ${st.slice(0,2).some(s=>s.id==='hospitality')?'':'Neither is part of the current culinary-only pathway.'}</div>`}
+  $('#dcGames').innerHTML=GAMES.map(g=>`<div class="traitrow"><span>${g.e} <b>${g.name}</b><br><span class="small muted">${g.what}</span></span></div>`).join('');
+};
+HOOK.matching=()=>{
+  const lv=$('#mtLiveBody');
+  const drawLive=()=>{lv.innerHTML=liveOppsHtml();$$('[data-oppf]').forEach(b=>b.onclick=()=>{S.oppF=b.dataset.oppf;drawLive();const nb=document.querySelector('[data-oppf="'+S.oppF+'"]');if(nb)nb.focus()})};
+  drawLive();
+  const el=$('#mtBody');
+  if(!S.consent.obo){el.innerHTML=lockHtml();return}
+  if(!hasData()){el.innerHTML=emptyHtml('No game results yet, so there is nothing to match. Play in the student view or reset the demo data.');return}
+  const r=ranked().filter(s=>s.band==='strong'||s.band==='explore').slice(0,4);
+  el.innerHTML=r.length?`<div class="grid g2">${r.map(s=>{const k=CLM[s.id],st=s.band==='strong';return `<div class="matchcard ${st?'':'explore'}"><h4>${k.careers[0]}</h4><div class="traitrow"><span>Alignment</span>${fitTag(s.band)}</div><div class="traitrow"><span>Area</span><span class="small muted">${k.ic} ${k.name} · ${s.score} / 100 · ${s.conf} confidence</span></div><div class="traitrow"><span>Why</span><span class="small muted">${evidenceFor(s.id,'partner')[0]||''}</span></div><div class="traitrow"><span>Interest styles</span><span class="small muted">${Object.keys(CLRI[s.id]).slice(0,2).map(L=>RIM[L].name).join(', ')}</span></div><div class="traitrow"><span>Support consideration</span><span class="small muted">${k.support}</span></div><div class="traitrow"><span>Next step</span><span class="small muted">${st?k.wbl[0]:'Needs more evidence. Try: '+k.wbl[0].toLowerCase()}</span></div></div>`}).join('')}</div>`:emptyHtml('No area has enough points yet.');
+};
+HOOK.employers=()=>{
+  const st=Object.fromEntries(stats().map(s=>[s.id,s]));
+  $('#bizRows').innerHTML=bizRows.map(x=>{
+    let fit;
+    if(x.fit==='all')fit='<span class="small muted">Supports every area</span>';
+    else if(x.fit==='elig')fit='<span class="small muted">Depends on eligibility, not on game results</span>';
+    else if(!S.consent.obo)fit='<span class="tag plain">Not shared</span>';
+    else if(!hasData())fit='<span class="tag plain">No results yet</span>';
+    else{const s=st[x.cl];fit=fitTag(s.band)+(s.score==null?'':` <span class="small muted">${s.score} / 100</span>`)}
+    return `<tr><td><b>${x.emp}</b></td><td>${x.what}</td><td>${x.type}</td><td>${fit}</td><td><span class="tag ${x.tag}">${x.stage}</span></td></tr>`;
+  }).join('');
+};
+
+/* ================= shell ================= */
+const ROLES={
+ student:{label:'Student',sub:'Maya R. plays the games',bdg:'ST',pill:'Student view',pages:[
+  ['s-home','Home','Career discovery games'],['s-play','Play','Short games, about ten minutes'],['s-results','My Results','What you liked and where it could lead'],['s-profile','My Career Profile','Strengths, resume and future plan'],['s-ready','My Readiness','Your job-ready checklist'],['s-support','Hear It &amp; Supports','Read aloud, larger buttons and extra time']]},
+ parent:{label:'Parent / Guardian',sub:"Maya's family",bdg:'PA',pill:'Parent view',pages:[
+  ['p-home','Overview',"Maya's Discovery results at a glance"],['p-results','Results in Detail','Scores, evidence and what each game saw'],['p-paths','Pathways','Careers, work-based learning and Southeastern options'],['p-consent','Privacy &amp; Sharing',"You decide who sees Maya's results"],['p-how','How the Game Works','What is measured and how it stays fair'],['p-profile','Career Profile','What Maya built: strengths, resume and plan'],['p-ready','Readiness Checklist',"Maya's steps toward a job or the next school"],['p-support','Supports &amp; Accommodations','Read aloud and other supports for Maya']]},
+ partner:{label:'Sherrita',sub:'Office of Business Opportunities',bdg:'OB',pill:'Discussion Draft — Not Yet Priced',pages:[
+  ['o-cohort','Cohort Dashboard','Discovery results across the junior and senior cohort'],['o-ready','Readiness Dashboard','Resume, cover letter, LinkedIn, TRC training and more'],['o-profile','Career Profile','Strengths, resume and future plan, with family approval'],['matching','Opportunity Matching','Evidence-based alignment'],['support','Support Journey','A dated intervention trail'],['careerprep','Career Readiness','Resume, interview &amp; workplace prep'],['employers','Employer Partners','Pipeline &amp; funding']]}
+};
+function renderPage(id){
+  const el=document.getElementById(id);
+  if(RENDER[id])el.innerHTML=RENDER[id]();
+  if(AFTER[id])AFTER[id](el);
+  if(HOOK[id])HOOK[id](el);
+  stackTables(el);
+}
+function stackTables(root){
+  root.querySelectorAll('table').forEach(t=>{
+    const hs=[...t.querySelectorAll('thead th')].map(h=>h.textContent.trim());
+    if(!hs.length)return;
+    t.classList.add('stack');
+    t.querySelectorAll('tbody tr').forEach(tr=>{
+      let i=0;
+      [...tr.children].forEach((td,k)=>{
+        if(k>0&&hs[i])td.setAttribute('data-label',hs[i]);
+        i+=(td.colSpan||1);
+      });
+    });
+  });
+}
+function show(id){
+  stopEngine();
+  const pages=ROLES[S.role].pages,pg=pages.find(p=>p[0]===id)||pages[0];id=pg[0];
+  if(id!=='s-play')S.preview=null;
+  S.page[S.role]=id;
+  $$('.section').forEach(s=>s.classList.toggle('active',s.id===id));
+  $$('#nav button').forEach(b=>b.classList.toggle('active',b.dataset.page===id));
+  $('#pageTitle').textContent=pg[1].replace(/&amp;/g,'&');$('#pageSub').innerHTML=pg[2];
+  renderPage(id);updateDemoBar();
+}
+function refresh(){renderPage(S.page[S.role]);updateDemoBar()}
+function setRole(r,page){
+  stopEngine();S.role=r;
+  $$('.role').forEach(b=>b.classList.toggle('active',b.dataset.role===r));
+  $('#nav').innerHTML=ROLES[r].pages.map(p=>`<button type="button" data-page="${p[0]}">${p[1]}</button>`).join('');
+  $('#rolePill').textContent=ROLES[r].pill;
+  show(page||S.page[r]||ROLES[r].pages[0][0]);
+}
+function updateDemoBar(){
+  const el=$('#demoStatus');
+  if(S.session.active)el.innerHTML=`<span class="live">Live</span> Maya is on game ${Math.min(S.order.length+1,S.session.n)} of ${S.session.n}. The other views update as each game finishes.`;
+  else if(S.live)el.innerHTML='<span class="live">Live</span> Every view is showing the session that was just played.';
+  else el.textContent='Demo with illustrative data. Maya R. is a composite student, not a real one.';
+}
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-say],[data-role],[data-page],[data-goto],[data-act]');if(!t)return;
+  const d=t.dataset;
+  if(d.say!==undefined){hearNow(d.say,t);return}
+  if(d.role){setRole(d.role);window.scrollTo(0,0)}
+  else if(d.page){show(d.page);window.scrollTo(0,0)}
+  else if(d.goto){const [r,p]=d.goto.split(':');setRole(r,p);window.scrollTo(0,0)}
+  else if(d.act==='start')beginRun();
+  else if(d.act&&d.act.indexOf('preview:')===0){S.preview=d.act.split(':')[1];setRole('student','s-play');window.scrollTo(0,0)}
+});
+$('#resetBtn').onclick=()=>{stopEngine();seed();stopSpeak();S.acc={big:false,extra:false,hear:false,auto:false,rate:'normal',by:''};document.body.classList.remove('big');setRole(S.role,S.page[S.role])};
+$('#roles').innerHTML=Object.entries(ROLES).map(([k,r])=>`<button class="role" type="button" data-role="${k}"><span class="bdg">${r.bdg}</span><span><b>${r.label}</b><span class="sub">${r.sub}</span></span></button>`).join('');
+seed();
+setRole('partner','o-cohort');
+</script>
+
+</body></html>

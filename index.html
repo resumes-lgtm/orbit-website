@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>ORBIT — GAPS™ Workforce Readiness Platform</title>
+<meta name="description" content="ORBIT is a workforce readiness intelligence platform organized around the GAPS™ framework — Growth, Advancement, Performance, and Strategic Risk — turning readiness gaps into diagnosed, tracked, and verified interventions.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Ccircle cx='32' cy='32' r='30' fill='%23020B20'/%3E%3Ccircle cx='32' cy='32' r='30' fill='none' stroke='url(%23g)' stroke-width='6'/%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='64' y2='64'%3E%3Cstop offset='0' stop-color='%23E8B963'/%3E%3Cstop offset='.5' stop-color='%235D5CEF'/%3E%3Cstop offset='1' stop-color='%2363CCDF'/%3E%3C/linearGradient%3E%3C/defs%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;0,700;0,800;1,600&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy-950:#020B20; --navy-900:#050F2E; --navy-800:#0E2260;
+  --gold-600:#8A5A0B; --gold-500:#E8B963; --gold-400:#F0CF94; --gold-100:#FBF1DC;
+  --bg:#F7F8FC; --surface:#FFFFFF; --surface-2:#F1F4FA;
+  --text:#0B1330; --text-dim:#3A4567; --muted:#5F6A8A; --line:#E0E5F1; --line-strong:#C9D1E6;
+  --accent:#1848E8; --on-accent:#FFFFFF; --accent-soft:#E8EEFF;
+  --purple:#4B4AD6; --purple-bg:#EEEEFD; --cyan:#1FA6BF;
+  --green:#17704A; --green-bg:#E5F4EC; --orange:#A85D07; --orange-bg:#FDF0DC;
+  --shadow:0 6px 24px rgba(2,11,32,.07); --shadow-lg:0 20px 60px rgba(2,11,32,.16);
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#040B1F; --surface:#0A1533; --surface-2:#0D1A3C;
+    --text:#ECF0FC; --text-dim:#C1CAE6; --muted:#8E9AC0; --line:#182652; --line-strong:#27386F;
+    --accent:#7C9BFF; --on-accent:#020B20; --accent-soft:#13235C;
+    --purple:#ADACFA; --purple-bg:#1F1F55; --cyan:#63CCDF;
+    --green:#4CC98A; --green-bg:#0E2E22; --orange:#F0A340; --orange-bg:#35240E;
+    --shadow:0 6px 24px rgba(0,0,0,.4); --shadow-lg:0 20px 60px rgba(0,0,0,.55);
+    color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+h1,h2,h3,h4{font-family:"Playfair Display",Georgia,serif;text-wrap:balance;margin:0;color:var(--text)}
+p{margin:0;line-height:1.65}
+a{color:inherit}
+::selection{background:var(--gold-500);color:var(--navy-950)}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.wrap{max-width:1120px;margin:0 auto;padding:0 24px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--gold-600)}
+.eyebrow:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold-500)}
+.mono{font-family:"IBM Plex Mono",monospace}
+section{padding:88px 0}
+@media(max-width:720px){section{padding:56px 0}}
+
+/* ---- header ---- */
+header.site{position:sticky;top:0;z-index:50;background:color-mix(in srgb, var(--bg) 88%, transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.headrow{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 24px;max-width:1120px;margin:0 auto}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo{width:32px;height:32px;flex:none;border-radius:50%;background:conic-gradient(from 220deg,#E8B963,#5D5CEF,#63CCDF,#E8B963);position:relative;box-shadow:0 0 0 2px var(--bg)}
+.logo:after{content:"";position:absolute;inset:6px;background:var(--navy-950);border-radius:50%}
+.brand b{font-family:"Playfair Display",serif;font-size:19px;letter-spacing:.02em;color:var(--text)}
+.brand small{display:block;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-top:-1px}
+nav.mainnav{display:flex;gap:26px;align-items:center}
+nav.mainnav a{font-size:13.5px;font-weight:600;color:var(--text-dim);text-decoration:none}
+nav.mainnav a:hover{color:var(--text)}
+.headcta{display:flex;gap:10px;align-items:center}
+@media(max-width:860px){nav.mainnav{display:none}}
+@media(max-width:640px){.headcta .btn.ghost{display:none}.brand small{display:none}}
+@media(max-width:380px){.headcta .btn{padding:10px 14px;font-size:12.5px}}
+
+/* ---- buttons ---- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:11px;padding:13px 22px;background:var(--accent);color:var(--on-accent);font-weight:700;font-size:14.5px;text-decoration:none;transition:transform .15s,opacity .15s;white-space:nowrap}
+.btn:hover{opacity:.92;transform:translateY(-1px)}
+.btn.ghost{background:transparent;color:var(--text);border:1.5px solid var(--line-strong)}
+.btn.ghost:hover{border-color:var(--accent);background:var(--accent-soft)}
+.btn.sm{padding:9px 16px;font-size:13px;border-radius:9px}
+.btn.gold{background:var(--gold-500);color:var(--navy-950)}
+
+/* ---- hero ---- */
+.hero{position:relative;overflow:hidden;min-height:660px;display:flex;align-items:center;padding:130px 0 70px;color:#0B1330}
+.hero-bg{position:absolute;inset:0;z-index:0}
+.hero-bg img{width:100%;height:100%;object-fit:cover;object-position:78% 32%;display:block}
+.hero-scrim{position:absolute;inset:0;z-index:1;background:linear-gradient(100deg,rgba(247,248,252,.97) 0%,rgba(247,248,252,.92) 30%,rgba(247,248,252,.66) 52%,rgba(247,248,252,.26) 75%,rgba(247,248,252,.06) 100%)}
+@media(max-width:860px){.hero-scrim{background:linear-gradient(175deg,rgba(247,248,252,.6) 0%,rgba(247,248,252,.85) 40%,rgba(247,248,252,.96) 75%)}}
+.hero .wrap{max-width:1500px}
+.hero-content{position:relative;z-index:2;max-width:560px}
+.hero .eyebrow{color:#8A5A0B}
+.hero .eyebrow:before{background:#E8B963}
+.hero h1{font-size:46px;line-height:1.1;margin:16px 0 16px;color:#0B1330}
+@media(max-width:560px){.hero h1{font-size:32px}}
+.hero p.lead{font-size:17.5px;color:#3A4567;max-width:52ch;line-height:1.6}
+.gapsline{margin-top:14px;font-size:15px;color:#3A4567}
+.gapsline b{color:#0B1330}
+.hero-cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.hero-fact{margin-top:34px;display:flex;gap:22px;flex-wrap:wrap}
+.hero-fact div{font-size:12.5px;color:#5F6A8A;max-width:24ch;line-height:1.5;padding-left:14px;border-left:2px solid var(--gold-600)}
+.hero-fact b{display:block;color:#0B1330;font-size:13.5px;font-weight:700;margin-bottom:2px}
+
+/* GAPS dimension words orbiting the core, over the hero photo */
+@media(max-width:860px){.hero{min-height:560px;padding:110px 0 60px}}
+@media(max-width:860px){.hero .wrap{max-width:1120px}}
+
+/* GAPS orbit diagram — the four dimension words circling the core */
+.gaps-orbit{position:relative;width:320px;height:320px;margin:40px auto 0}
+.gaps-orbit .ring{position:absolute;border-radius:50%;border:1.5px dashed var(--line-strong)}
+.gaps-orbit .ring.r1{inset:0}
+.gaps-orbit .ring.r2{inset:16%;border-color:var(--line)}
+.engine-badge{position:absolute;inset:36%;border-radius:50%;background:url(images/helix-nebula.jpg) center/cover;box-shadow:0 0 0 4px var(--surface),0 8px 30px rgba(2,11,32,.25)}
+.engine-badge:after{content:"GAPS™";position:absolute;inset:12%;background:var(--navy-950);border-radius:50%;display:grid;place-items:center;color:#fff;font-family:"Playfair Display",serif;font-weight:700;font-size:12.5px;letter-spacing:.03em;box-shadow:0 0 0 1px rgba(255,255,255,.15)}
+.gaps-orbit .node{position:absolute;background:var(--navy-950);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:9px 12px;box-shadow:var(--shadow);font-size:12px;font-weight:700;color:#fff;display:flex;align-items:center;gap:6px;white-space:nowrap}
+.gaps-orbit .node .dot{width:7px;height:7px;border-radius:50%;flex:none}
+.gaps-orbit .n1{top:2%;left:50%;transform:translateX(-50%)}
+.gaps-orbit .n2{top:50%;right:-2%;transform:translateY(-50%)}
+.gaps-orbit .n3{bottom:2%;left:50%;transform:translateX(-50%)}
+.gaps-orbit .n4{top:50%;left:-2%;transform:translateY(-50%)}
+@media(max-width:560px){.gaps-orbit{width:240px;height:240px}.gaps-orbit .node{font-size:10px;padding:6px 9px}}
+@media(max-width:560px){.hero{min-height:480px}}
+
+/* status strip */
+.statusbar{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--surface-2)}
+.statusbar .wrap{display:flex;gap:24px;flex-wrap:wrap;align-items:center;justify-content:space-between;padding:14px 24px;font-size:12.5px;color:var(--muted)}
+.statuspill{display:inline-flex;align-items:center;gap:7px;font-weight:700;color:var(--gold-600)}
+.statuspill:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold-500)}
+
+/* ---- tables ---- */
+.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px;background:var(--surface);box-shadow:var(--shadow)}
+table{width:100%;border-collapse:collapse;font-size:13.5px;min-width:640px}
+th,td{padding:15px 16px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+tr:last-child td{border-bottom:0}
+th{background:var(--surface-2);color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-weight:700}
+td b{color:var(--text)}
+td.q{color:var(--text-dim);font-style:italic}
+.dimtag{display:inline-flex;padding:4px 10px;border-radius:7px;font-size:11.5px;font-weight:700}
+.dimtag.g{background:var(--green-bg);color:var(--green)}
+.dimtag.a{background:var(--accent-soft);color:var(--accent)}
+.dimtag.p{background:var(--orange-bg);color:var(--orange)}
+.dimtag.s{background:var(--purple-bg);color:var(--purple)}
+
+/* ---- GAPS cards ---- */
+.fw-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:36px}
+@media(max-width:900px){.fw-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.fw-grid{grid-template-columns:1fr}}
+.fw-card{border-radius:16px;padding:22px 20px;color:#fff;position:relative;overflow:hidden;min-height:200px;display:flex;flex-direction:column}
+.fw-card:before{content:"";position:absolute;inset:0;background:linear-gradient(160deg,rgba(255,255,255,.14),transparent 60%)}
+.fw-g{background:linear-gradient(160deg,#1f7a4d,#124a2e)}
+.fw-a{background:linear-gradient(160deg,#2c5fb8,#173a80)}
+.fw-p{background:linear-gradient(160deg,#c97a1f,#8f560e)}
+.fw-s{background:linear-gradient(160deg,#6b35ba,#432271)}
+.fw-card .letter{font-family:"Playfair Display",serif;font-size:32px;font-weight:800;position:relative}
+.fw-card h4{color:#fff;font-size:16.5px;margin:8px 0 8px;position:relative}
+.fw-card .q{font-size:12.5px;line-height:1.5;opacity:.95;position:relative;font-style:italic;margin-top:auto;padding-top:10px;border-top:1px solid rgba(255,255,255,.25)}
+.fw-card p{font-size:13px;line-height:1.55;opacity:.95;position:relative}
+
+/* ---- loop steps ---- */
+.loop{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:40px;position:relative}
+@media(max-width:860px){.loop{grid-template-columns:1fr}}
+.loopstep{background:var(--surface);border:1px solid var(--line);padding:24px 20px;position:relative}
+.loopstep:first-child{border-radius:16px 0 0 16px}
+.loopstep:last-child{border-radius:0 16px 16px 0}
+@media(max-width:860px){.loopstep{border-radius:0!important;border-bottom:0}.loopstep:first-child{border-radius:16px 16px 0 0!important}.loopstep:last-child{border-radius:0 0 16px 16px!important;border-bottom:1px solid var(--line)}}
+.loopstep .num{font-family:"Playfair Display",serif;font-size:28px;font-weight:800;color:var(--line-strong)}
+.loopstep h4{font-size:15.5px;margin:8px 0 8px}
+.loopstep p{font-size:13px;color:var(--text-dim);line-height:1.55}
+.loop-arrow{position:absolute;top:50%;right:-11px;transform:translateY(-50%);width:22px;height:22px;border-radius:50%;background:var(--gold-500);color:var(--navy-950);display:grid;place-items:center;font-size:12px;z-index:2}
+@media(max-width:860px){.loop-arrow{top:auto;bottom:-11px;right:50%;transform:translateX(50%) rotate(90deg)}}
+.loop-close{margin-top:22px;font-size:14px;color:var(--text-dim);border-left:3px solid var(--gold-500);padding-left:16px;line-height:1.6;max-width:70ch}
+.iso-strip{margin-top:26px;padding:16px 18px;border:1px dashed var(--line-strong);border-radius:12px;background:var(--surface-2);display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.iso-badges{display:flex;gap:8px;flex-wrap:wrap}
+.iso-badges span{font-size:11.5px;font-weight:700;padding:5px 9px;border-radius:6px;background:var(--surface);border:1px solid var(--line-strong);color:var(--text-dim)}
+.iso-strip p{font-size:12.5px;color:var(--muted);flex:1;min-width:220px}
+
+/* ---- tiers ---- */
+.tier-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;margin-top:40px}
+@media(max-width:900px){.tier-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.tier-grid{grid-template-columns:1fr}}
+.tier-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px 20px;box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px}
+.tier-badge{width:36px;height:36px;border-radius:10px;background:var(--navy-950);color:var(--gold-500);display:grid;place-items:center;font-family:"Playfair Display",serif;font-weight:700;font-size:13px}
+.tier-card h4{font-size:16px}
+.tier-card p{font-size:13px;color:var(--text-dim);line-height:1.6}
+.tier-q{font-size:12.5px;font-style:italic;color:var(--text-dim);border-top:1px solid var(--line);padding-top:10px;margin-top:auto}
+.tier-card a.proof{font-size:12.5px;font-weight:700;color:var(--accent);text-decoration:none;margin-top:auto}
+.tier-card a.proof:hover{text-decoration:underline}
+.tier-live{display:inline-flex;align-self:flex-start;font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--green);background:var(--green-bg);padding:3px 8px;border-radius:6px}
+
+/* ---- fix: proof-to-practice ---- */
+.proofcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:32px;box-shadow:var(--shadow-lg)}
+.prooftag{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:700;padding:5px 11px;border-radius:8px}
+.tool-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:22px}
+@media(max-width:860px){.tool-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:560px){.tool-grid{grid-template-columns:1fr}}
+.toolcard{background:var(--surface-2);border:1px solid var(--line);border-radius:14px;padding:16px}
+.picon{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
+.picon svg{width:18px;height:18px}
+.picon.g{background:var(--green-bg);color:var(--green)}
+.picon.a{background:var(--accent-soft);color:var(--accent)}
+.picon.p{background:var(--orange-bg);color:var(--orange)}
+.picon.s{background:var(--purple-bg);color:var(--purple)}
+.toolcard .dimtag{margin-bottom:10px}
+.toolcard h4{font-size:14.5px;margin-bottom:6px}
+.toolcard h4.q{font-style:italic;font-size:16px;line-height:1.4;margin-bottom:10px}
+.toolcard p b{color:var(--text);font-style:normal}
+.toolcard p{font-size:12.5px;color:var(--text-dim);line-height:1.55}
+a.proof{font-size:13.5px;font-weight:700;color:var(--accent);text-decoration:none}
+a.proof:hover{text-decoration:underline}
+
+/* ---- trust ---- */
+.trust{background:linear-gradient(160deg,#0B1C4A,var(--navy-950));color:#fff;border-radius:24px;padding:52px 44px;margin:0 auto;max-width:1072px;border:1px solid rgba(255,255,255,.1);box-shadow:var(--shadow-lg);position:relative;overflow:hidden}
+.trust:before{content:"";position:absolute;right:-90px;bottom:-140px;width:420px;height:420px;border-radius:50%;background:url(images/earth-epic.jpg) center/cover;opacity:.28;pointer-events:none}
+.trust>*{position:relative;z-index:1}
+@media(max-width:640px){.trust{padding:36px 24px;border-radius:18px}}
+.trust h2{color:#fff;font-size:30px}
+.trust p.lead{color:#C1CAE6;font-size:15.5px;max-width:60ch;margin-top:14px}
+.trust-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:32px}
+@media(max-width:760px){.trust-grid{grid-template-columns:1fr}}
+.trust-item{border-top:2px solid var(--gold-500);padding-top:14px}
+.trust-item b{display:block;color:#fff;font-size:14.5px;margin-bottom:6px}
+.trust-item span{color:#9FB0D6;font-size:13px;line-height:1.6}
+
+/* ---- CTA ---- */
+.cta{text-align:center}
+.cta h2{font-size:32px;max-width:26ch;margin:0 auto}
+.cta p.lead{max-width:56ch;margin:16px auto 0;color:var(--text-dim);font-size:15.5px}
+.cta .hero-cta{justify-content:center}
+
+/* ---- footer ---- */
+footer{border-top:1px solid var(--line);padding:44px 0 32px}
+.foot-grid{display:flex;justify-content:space-between;gap:24px;flex-wrap:wrap}
+.foot-links{display:flex;gap:22px;flex-wrap:wrap;font-size:13px;color:var(--text-dim)}
+.foot-links a{text-decoration:none}
+.foot-links a:hover{color:var(--text)}
+.foot-fine{margin-top:24px;font-size:12px;color:var(--muted);line-height:1.7;max-width:70ch}
+
+.reveal{opacity:0;transform:translateY(14px);transition:opacity .5s ease,transform .5s ease}
+.reveal.show{opacity:1;transform:none}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}.reveal{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="headrow">
+    <a class="brand" href="#top"><div class="logo"></div><div><b>ORBIT</b><small>Workforce Readiness Intelligence</small></div></a>
+    <nav class="mainnav">
+      <a href="#problems">The Problems</a>
+      <a href="#gaps">GAPS™</a>
+      <a href="#how">How It Works</a>
+      <a href="#case-studies">Case Studies</a>
+      <a href="#tiers">Where It Runs</a>
+      <a href="#kce">KCE™</a>
+      <a href="#trust">Trust</a>
+    </nav>
+    <div class="headcta">
+      <a class="btn ghost sm" href="demo.html">See ORBIT in Action</a>
+      <a class="btn sm" href="#cta">Book a GAPS™ Assessment</a>
+    </div>
+  </div>
+</header>
+
+<main id="top">
+
+<div class="hero">
+  <div class="hero-bg" aria-hidden="true"><img src="images/astronaut-mccandless.jpg" alt=""></div>
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero-content">
+      <span class="eyebrow">GAPS™ Workforce Readiness Framework</span>
+      <h1>One Engine. Multiple Angles on Workforce Readiness.</h1>
+      <p class="lead">ORBIT solves the workforce readiness problem by identifying GAPS™ across people, pathways, programs, and organizations.</p>
+      <p class="gapsline"><b>GAPS™</b> = Growth · Advancement · Performance · Strategic Risk</p>
+      <div class="hero-cta">
+        <a class="btn" href="demo.html">See ORBIT in Action</a>
+        <a class="btn ghost" href="#how" style="border-color:#C9D1E6;color:#0B1330">How It Works</a>
+      </div>
+      <div class="hero-fact">
+        <div><b>One engine, four angles</b>Growth, Advancement, Performance, and Strategic Risk, scored continuously at the individual, program, and organizational level.</div>
+        <div><b>Diagnosis to proof</b>Every flagged gap carries a specific intervention and a verified outcome — not just a red number on a dashboard.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="statusbar">
+  <div class="wrap">
+    <span class="statuspill">Discussion draft — not yet priced</span>
+    <span>Early Development is a concept build; not yet under contract with any district</span>
+    <span>Every gap is traced to a root cause — not asserted</span>
+  </div>
+</div>
+
+<section id="problems">
+  <div class="wrap">
+    <span class="eyebrow">The problems ORBIT was built to solve</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:28ch">You've probably said one of these out loud this year.</h2>
+    <div class="tool-grid reveal" style="margin-top:32px">
+      <div class="toolcard"><div class="picon s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2h12l-6 10 6 10H6l6-10z"/></svg></div><span class="dimtag s">Strategic Risk</span><h4 class="q">"My workforce is aging, and I'm not sure the next generation is ready to take over."</h4><p><b>An Aging Workforce &amp; New Workforce Mix.</b> Protecting institutional knowledge while preparing newer talent to perform as experienced employees transition out.</p></div>
+      <div class="toolcard"><div class="picon p"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div><span class="dimtag p">Performance</span><h4 class="q">"She's been out for six months. I want to say she's ready — I just don't actually know."</h4><p><b>The 6-Month Absence Trust Gap.</b> When someone's been away, moved roles, or hasn't shown a skill recently, leaders often lack current evidence readiness is still there.</p></div>
+      <div class="toolcard"><div class="picon s"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z"/></svg></div><span class="dimtag s">Strategic Risk</span><h4 class="q">"My board doesn't want a training update. They want to know our risk actually went down."</h4><p><b>Alignment to International Risk Standards.</b> Translating workforce readiness into measurable risk, governance, evidence, and reporting — not a standalone HR activity.</p></div>
+      <div class="toolcard"><div class="picon a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16l-6 8v6l-4 2v-8z"/></svg></div><span class="dimtag a">Advancement</span><h4 class="q">"I've spent a fortune on interns and new grads. I still can't tell you which ones are going to make it."</h4><p><b>Early Talent Investment Leakage.</b> Heavy investment in interns, students, and emerging talent without visibility into whether it becomes usable workforce capability.</p></div>
+      <div class="toolcard"><div class="picon a"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="12" r="2.5"/><circle cx="19" cy="12" r="2.5"/><line x1="7.5" y1="12" x2="16.5" y2="12"/></svg></div><span class="dimtag a">Advancement</span><h4 class="q">"We hired her six months ago. I still don't know if she can do the job on her own."</h4><p><b>The Intern-to-Impact Bridge.</b> Closing the gap between "we hired them" and "they can independently contribute" — where readiness, interest, role matching, and conversion meet.</p></div>
+      <div class="toolcard"><div class="picon g"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.6 1.4c0 1.6-2.6 2.1-2.6 3.6"/><line x1="12" y1="17" x2="12" y2="17.01"/></svg></div><span class="dimtag g">Growth</span><h4 class="q">"Honestly? 'I think he's ready' is the only evidence I have."</h4><p><b>Subjectivity in Readiness &amp; Development.</b> Replacing gut-feel with evidence across capability, behavior, outcomes, and manager input.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="gaps">
+  <div class="wrap">
+    <span class="eyebrow">GAPS™ — the four readiness dimensions</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:26ch">Every readiness question ORBIT answers falls under one of four dimensions.</h2>
+    <p class="lead" style="margin-top:14px;font-size:15.5px;max-width:64ch">Together they're GAPS™ — one engine, scored continuously, at the individual, program, and organizational level.</p>
+    <div class="gaps-orbit" aria-hidden="true">
+      <div class="ring r1"></div>
+      <div class="ring r2"></div>
+      <div class="engine-badge"></div>
+      <div class="node n1"><span class="dot" style="background:#1f7a4d"></span>Growth</div>
+      <div class="node n2"><span class="dot" style="background:#2c5fb8"></span>Advancement</div>
+      <div class="node n3"><span class="dot" style="background:#c97a1f"></span>Performance</div>
+      <div class="node n4"><span class="dot" style="background:#6b35ba"></span>Strategic Risk</div>
+    </div>
+    <div class="fw-grid">
+      <div class="fw-card fw-g reveal"><span class="letter">G</span><h4>Growth</h4><p>Whether people and programs are developing at the pace the organization needs.</p><div class="q">"Are we building capability fast enough?"</div></div>
+      <div class="fw-card fw-a reveal"><span class="letter">A</span><h4>Advancement</h4><p>Whether the right people are moving into the right roles at the right time.</p><div class="q">"Is our pipeline actually working?"</div></div>
+      <div class="fw-card fw-p reveal"><span class="letter">P</span><h4>Performance</h4><p>Whether readiness is translating into measurable outcomes.</p><div class="q">"Is the investment paying off?"</div></div>
+      <div class="fw-card fw-s reveal"><span class="letter">S</span><h4>Strategic Risk</h4><p>Where a gap in the above three creates exposure — succession, knowledge loss, compliance.</p><div class="q">"What happens if we do nothing?"</div></div>
+    </div>
+  </div>
+</section>
+
+<section id="how" style="background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">How ORBIT works</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:24ch">Four steps, one continuous loop — not a one-time assessment.</h2>
+    <div class="loop">
+      <div class="loopstep reveal"><span class="num">1</span><h4>Where the gap is.</h4><p>ORBIT scans people, pathways, programs, and organizations against the GAPS™ dimensions and flags exactly where readiness is falling short.</p><div class="loop-arrow">→</div></div>
+      <div class="loopstep reveal"><span class="num">2</span><h4>Why it exists.</h4><p>Every flagged gap is traced to its root cause — a skills shortfall, a broken pathway, a program that isn't converting, an unmanaged risk.</p><div class="loop-arrow">→</div></div>
+      <div class="loopstep reveal"><span class="num">3</span><h4>What to do about it.</h4><p>Leaders get a specific, prioritized intervention — not a dashboard of red numbers with no next step.</p><div class="loop-arrow">→</div></div>
+      <div class="loopstep reveal"><span class="num">4</span><h4>Whether it worked.</h4><p>ORBIT tracks the intervention against the original gap and reports the outcome, closing the loop from diagnosis to proof.</p></div>
+    </div>
+    <p class="loop-close">This is the loop that separates ORBIT from a reporting dashboard: it doesn't just show you the gap, it verifies the fix. <a href="sample-assessment.html" style="color:var(--accent);font-weight:700;text-decoration:none;border-bottom:1px dashed var(--accent)">See what that looks like in a sample assessment →</a></p>
+    <div class="iso-strip">
+      <div class="iso-badges">
+        <span>ISO 31000</span><span>ISO 30414</span><span>ISO 30401</span><span>ISO 22301</span><span>ISO 42001</span>
+      </div>
+      <p>Step 4's verification is designed in reference to ISO frameworks for risk (31000), human capital reporting (30414), knowledge management (30401), business continuity (22301), and AI management (42001) — alignment, not certification.</p>
+    </div>
+  </div>
+</section>
+
+<section id="fix">
+  <div class="wrap">
+    <span class="eyebrow">From proof to practice</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:28ch">A verified gap isn't the finish line. It's a menu of ways to close it.</h2>
+    <p class="lead" style="margin-top:14px;font-size:15.5px;max-width:70ch">ORBIT doesn't stop at step 4 and hand leadership a memo. For every diagnosed gap, it draws from a working library of interventions and builds out the specific combination that fits — not one generic fix stretched across every gap.</p>
+    <div class="proofcard reveal" style="margin-top:32px">
+      <span class="prooftag" style="color:var(--accent);background:var(--accent-soft)">Illustrative — one gap, several possible fixes</span>
+      <h3 style="font-size:19px;margin-top:14px">Which combination gets built depends on what step 2 finds — not a template.</h3>
+      <p style="font-size:14px;color:var(--text-dim);margin-top:8px;max-width:70ch">An Advancement gap, for example, could be closed by any of several tools — the mix ORBIT actually builds depends on the root cause, not a one-size answer:</p>
+      <div class="tool-grid">
+        <div class="toolcard"><h4>Opportunity matching engine</h4><p>When the pipeline exists but isn't visible — surfaces real, local next steps against readiness.</p></div>
+        <div class="toolcard"><h4>Structured mentorship pairing</h4><p>When advancement stalls for lack of sponsorship, not capability.</p></div>
+        <div class="toolcard"><h4>Internal mobility marketplace</h4><p>When roles open up but the people ready for them never hear about it.</p></div>
+        <div class="toolcard"><h4>Career-pathway dashboard</h4><p>When the path exists but no one can see where they are on it.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="case-studies" style="background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">Concept builds</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:26ch">Where the process has actually been built out.</h2>
+    <p class="lead" style="margin-top:14px;font-size:15.5px;max-width:64ch">One tier has a finished, working concept system behind it today — built, but not yet under contract with any district. The rest are earlier in the same process.</p>
+    <div class="proofcard reveal" style="margin-top:28px">
+      <span class="tier-live" style="margin-bottom:4px;background:var(--accent-soft);color:var(--accent)">Concept build · Early Development</span>
+      <h3 style="font-size:20px;margin-top:12px">A diagnosis alone isn't the point. A whole transition system is.</h3>
+      <p style="font-size:14px;color:var(--text-dim);margin-top:8px;max-width:70ch">For the Early Development concept, the fix wasn't a single tool — it was six, each aimed at a specific gap in getting juniors and seniors with disabilities from school to employment.</p>
+      <div class="tool-grid">
+        <div class="toolcard"><span class="dimtag g">Growth</span><h4>Career Discovery Games</h4><p>Ten-minute, game-based activities that surface real interest, so development effort isn't a guess.</p></div>
+        <div class="toolcard"><span class="dimtag g">Growth</span><h4>Career Profile Builder</h4><p>Turns Discovery results into a working resume and a three-year plan, in the student's own words.</p></div>
+        <div class="toolcard"><span class="dimtag a">Advancement</span><h4>Opportunity Matching</h4><p>Lines up readiness against real local programs, employers, and funding — not a generic careers list.</p></div>
+        <div class="toolcard"><span class="dimtag a">Advancement</span><h4>Partner Map &amp; Funding</h4><p>Builds the employer pipeline itself, and shows exactly where it still needs to grow.</p></div>
+        <div class="toolcard"><span class="dimtag p">Performance</span><h4>Readiness Dashboard</h4><p>Tracks resume, cover letter, LinkedIn, and training attendance — student-by-student and cohort-wide.</p></div>
+        <div class="toolcard"><span class="dimtag s">Strategic Risk</span><h4>Support Journey</h4><p>A dated intervention trail with a named owner on every action, so nothing slips through.</p></div>
+      </div>
+      <a class="proof" style="margin-top:22px;display:inline-flex" href="demo.html">See the full built system for Early Development →</a>
+    </div>
+    <div class="proofcard reveal" style="margin-top:20px;opacity:.8">
+      <span class="tier-live" style="margin-bottom:4px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)">In development · Employee Development</span>
+      <h3 style="font-size:18px;margin-top:12px">Concept build in progress.</h3>
+      <p style="font-size:14px;color:var(--text-dim);margin-top:8px;max-width:70ch">Its case study publishes once there's a verified result to show — we'd rather show proof than a preview.</p>
+    </div>
+  </div>
+</section>
+
+
+<section id="tiers" style="background:var(--surface-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="wrap">
+    <span class="eyebrow">Where GAPS™ runs</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:26ch">One framework, four points in the workforce lifecycle.</h2>
+    <p class="lead" style="margin-top:14px;font-size:15.5px;max-width:64ch">The same four dimensions apply whether the person being tracked is starting their first job or sitting in the C-suite.</p>
+    <div class="tier-grid">
+      <div class="tier-card reveal">
+        <span class="tier-live" style="background:var(--accent-soft);color:var(--accent)">Concept build</span>
+        <div class="tier-badge">ED</div>
+        <h4>Early Development</h4>
+        <p>Students and early-career talent building the first readiness record of their working life. A concept build tracks GAPS™ for juniors and seniors with disabilities transitioning to employment.</p>
+        <a class="proof" href="demo.html">See the Early Development concept →</a>
+      </div>
+      <div class="tier-card reveal">
+        <span class="tier-live" style="background:var(--surface-2);color:var(--muted);border:1px solid var(--line)">In development</span>
+        <div class="tier-badge">EM</div>
+        <h4>Employee Development</h4>
+        <p>Individual contributors and frontline teams, tracked against the capability and advancement their role actually requires — not a generic training calendar.</p>
+      </div>
+      <div class="tier-card reveal">
+        <div class="tier-badge">EX</div>
+        <h4>Executive Development</h4>
+        <p>Leaders being built for what's next, with succession and readiness tracked years before a seat opens — not the week after it does.</p>
+        <div class="tier-q">"Are you ready if half your executives leave?"</div>
+      </div>
+      <div class="tier-card reveal">
+        <div class="tier-badge">WG</div>
+        <h4>Workforce Readiness &amp; Risk Governance</h4>
+        <p>The organization-wide view: where GAPS™ concentrate, where they create exposure, and where governance needs visibility before it becomes a headline.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="kce">
+  <div class="wrap">
+    <span class="eyebrow">A service inside Workforce Readiness &amp; Risk Governance</span>
+    <h2 style="font-size:32px;margin-top:14px;max-width:28ch">ORBIT KCE™ — Enterprise Knowledge Intelligence &amp; Continuity</h2>
+    <p class="lead" style="margin-top:14px;font-size:15.5px;max-width:70ch">Most organizations can find where information is stored. Far fewer can answer whether the knowledge that actually runs the business is protected, current, or recoverable. ORBIT KCE™ is built to answer that — the intelligence layer behind the Executive Development and Workforce Readiness &amp; Risk Governance tiers.</p>
+    <p style="margin-top:18px;font-size:13.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--gold-600)">Six things it solves for</p>
+    <div class="tool-grid reveal">
+      <div class="toolcard"><h4>Knowledge Criticality</h4><p>Know which knowledge actually matters, and why, across operational, financial, client, and strategic consequence — in one score leadership can act on.</p></div>
+      <div class="toolcard"><h4>Knowledge Concentration</h4><p>See past headcount to who actually carries the knowledge. Five people on a process can mean one person effectively holds it.</p></div>
+      <div class="toolcard"><h4>Successor &amp; Backup Readiness</h4><p>The difference between "someone else could probably do it" and a validated, capable backup — measured, not assumed.</p></div>
+      <div class="toolcard"><h4>Tacit Knowledge Exposure</h4><p>Surfaces the judgment, exceptions, and institutional memory that never made it into a document.</p></div>
+      <div class="toolcard"><h4>Governance &amp; AI-Readiness</h4><p>A clear owner, validation date, and access rule for every critical knowledge domain — and a straight answer on whether it's safe for AI to use.</p></div>
+      <div class="toolcard"><h4>Recovery Readiness</h4><p>A direct answer to the question that matters: if the person who understands the work became unavailable today, could it continue tomorrow?</p></div>
+    </div>
+    <p style="margin-top:24px;font-size:14px;color:var(--text-dim);max-width:70ch">This is what turns a Strategic Risk flag into something leadership can actually close — the same loop as every GAPS™ dimension: where the gap is, why it exists, what to do about it, and whether it worked.</p>
+  </div>
+</section>
+
+<section id="trust">
+  <div class="trust reveal">
+    <span class="eyebrow" style="color:var(--gold-500)">Why trust it</span>
+    <h2>Evidence, not optimism.</h2>
+    <p class="lead">ORBIT doesn't show a polished number where a real answer isn't confirmed yet — a readiness platform that guesses isn't one leadership can act on.</p>
+    <div class="trust-grid">
+      <div class="trust-item"><b>Every gap traced to evidence</b><span>Root causes are named, not implied — a skills shortfall, a broken pathway, a program that isn't converting, an unmanaged risk.</span></div>
+      <div class="trust-item"><b>Every intervention tracked to proof</b><span>ORBIT reports whether the fix actually worked, closing the loop instead of moving on to the next dashboard.</span></div>
+      <div class="trust-item"><b>Governance built for scrutiny</b><span>Verification is designed in reference to ISO risk, human-capital, and AI-governance frameworks — named plainly, not implied.</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="cta" class="cta">
+  <div class="wrap">
+    <span class="eyebrow">Readiness isn't a report card</span>
+    <h2 style="margin-top:14px">It's a loop.</h2>
+    <p class="lead">ORBIT identifies where your organization's GAPS™ are, why they exist, what to do, and whether it worked — continuously, not once a year.</p>
+    <div class="hero-cta">
+      <a class="btn gold" href="mailto:jhenealmcduffie@gmail.com?subject=Book%20a%20GAPS%E2%84%A2%20Assessment">Book a GAPS™ Assessment</a>
+      <a class="btn ghost" href="sample-assessment.html">See a sample assessment</a>
+      <a class="btn ghost" href="demo.html">Explore the Platform</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <a class="brand" href="#top"><div class="logo"></div><div><b>ORBIT</b><small>Workforce Readiness Intelligence</small></div></a>
+      <div class="foot-links">
+        <a href="#problems">The Problems</a>
+        <a href="#gaps">GAPS™</a>
+        <a href="#how">How It Works</a>
+        <a href="#case-studies">Case Studies</a>
+        <a href="#tiers">Where It Runs</a>
+        <a href="#kce">KCE™</a>
+        <a href="#trust">Trust</a>
+        <a href="demo.html">Demo</a>
+        <a href="mailto:jhenealmcduffie@gmail.com">Contact</a>
+      </div>
+    </div>
+    <p class="foot-fine">GAPS™ is ORBIT's proprietary readiness framework. ORBIT is a discussion-draft concept, currently unpriced and not yet under contract with any organization. The Early Development interactive demo uses illustrative data — Maya R. is a composite student, not a real one. ISO framework references describe design alignment, not certification.</p>
+  </div>
+</footer>
+
+<script>
+if(!window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+  const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('show');io.unobserve(e.target)}}),{threshold:.12});
+  document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+}else{
+  document.querySelectorAll('.reveal').forEach(el=>el.classList.add('show'));
+}
+</script>
+</body>
+</html>
